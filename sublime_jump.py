@@ -5,6 +5,7 @@ import string
 from pprint import pprint
 
 PLACEHOLDER_CHARS = (string.lowercase + string.uppercase + string.digits)
+REGEX_ESCAPE_CHARS = '\\+*()[]{}^$?|:].,'
 
 
 class SublimeJumpCommand(sublime_plugin.WindowCommand):
@@ -29,8 +30,6 @@ class SublimeJumpCommand(sublime_plugin.WindowCommand):
         self.jump_character = character
         self.edit = self.active_view.begin_edit()
 
-        # print(self.found_char_regions)
-
         if len(self.found_char_regions) > 0:
             self.prompt_for_jump()
         else:
@@ -43,12 +42,19 @@ class SublimeJumpCommand(sublime_plugin.WindowCommand):
         search_text = self.active_view.substr(region)
         matching_regions = []
         region_begin = region.begin()
+        escaped_character = self.escape_character(character)
 
-        for char_at in (match.start() for match in re.finditer(character, search_text)):
+        for char_at in (match.start() for match in re.finditer(escaped_character, search_text)):
             char_point = char_at + region_begin
             matching_regions.append(sublime.Region(char_point, char_point + 1))
 
         return matching_regions
+
+    def escape_character(self, character):
+        if (REGEX_ESCAPE_CHARS.find(character) >= 0):
+            return '\\' + character
+        else:
+            return character
 
     def prompt_for_jump(self):
         self.transform_found_chars()
@@ -59,7 +65,7 @@ class SublimeJumpCommand(sublime_plugin.WindowCommand):
         self.jump_to(selection)
 
     def jump_to(self, selection):
-        winning_index = PLACEHOLDER_CHARS.index(selection)
+        winning_index = PLACEHOLDER_CHARS.find(selection)
 
         if (winning_index >= 0):
             winning_region = self.found_char_regions[winning_index]
@@ -71,12 +77,7 @@ class SublimeJumpCommand(sublime_plugin.WindowCommand):
             self.active_view.show(winning_point)
 
     def transform_found_chars(self):
-        # iterate through the regions and replace each with an incrementing a-zA-Z0-9
-
-        # TODO care about where cursor is currently and expand out from that region
-
         for char_region, placeholder_char in (zip(self.found_char_regions, PLACEHOLDER_CHARS)):
-            # print(char_region, placeholder_char)
             self.active_view.replace(self.edit, char_region, placeholder_char)
 
         self.active_view.add_regions("jump_match_regions", self.found_char_regions, "comment", "dot", sublime.DRAW_OUTLINED)
