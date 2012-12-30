@@ -27,7 +27,7 @@ if you wanted to go to the `r` in the `realpart` in the method signature, instea
 
 ![SublimeJump Middle](https://raw.github.com/tednaleid/SublimeJump/add_images/images/sublimejump_middle.png)
 
-with each instance of `r` turned into one of `a-zA-Z0-9`.  It then prompts you for the one you want to go to, just press `a` and hit enter and your cursor will be at the beginning of `realpart` in the signature (and all characters will revert to their previous value).
+Notice that each instance of `r` has been turned into one of `a-zA-Z0-9`.  Press `a` and hit enter and your cursor will be at the beginning of `realpart` in the signature (and all characters will revert to their previous value).
 
 ![SublimeJump Middle](https://raw.github.com/tednaleid/SublimeJump/add_images/images/sublimejump_end.png)
 
