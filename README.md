@@ -23,7 +23,7 @@ So if you were editing this class, and your cursor is at the end of the file
 
 ![SublimeJump Begin](https://raw.github.com/tednaleid/SublimeJump/add_images/images/sublimejump_begin.png)
 
-if you wanted to go to the `r` in the `realpart` in the method signature, instead of hitting the up arrow twice and scrolling over to the r (or grabbing your mouse), you could press `cmd-;` followed by `r`.  That will transform your file into this:
+if you wanted to go to the `r` in the `realpart` in the method signature, instead of hitting the up arrow three times and scrolling over to the r (or grabbing your mouse), you could press `cmd-;` followed by `r`.  That will transform your file into this:
 
 ![SublimeJump Middle](https://raw.github.com/tednaleid/SublimeJump/add_images/images/sublimejump_middle.png)
 
