@@ -23,11 +23,11 @@ So if you were editing this class, and your cursor is at the end of the file
 
 ![SublimeJump Begin](https://raw.github.com/tednaleid/SublimeJump/add_images/images/sublimejump_begin.png)
 
-if you wanted to go to the `r` in the `realpart` in the method signature, instead of hitting the up arrow three times and scrolling over to the r (or grabbing your mouse), you could press `cmd-;` followed by `r`.  That will transform your file into this:
+if you wanted to go to the `r` in the `realpart` in the method signature, instead of hitting the up arrow three times and scrolling over to the r (or grabbing your mouse), you could press `cmd-;` followed by `r`.  That will transform your file into this (notice that each instance of `r` has been turned into one of `a-zA-Z0-9`):
 
 ![SublimeJump Middle](https://raw.github.com/tednaleid/SublimeJump/add_images/images/sublimejump_middle.png)
 
-Notice that each instance of `r` has been turned into one of `a-zA-Z0-9`.  Press `a` and hit enter and your cursor will be at the beginning of `realpart` in the signature (and all characters will revert to their previous value).
+Press `a` and hit enter and your cursor will be at the beginning of `realpart` in the signature (and all characters will revert to their previous value).
 
 ![SublimeJump Middle](https://raw.github.com/tednaleid/SublimeJump/add_images/images/sublimejump_end.png)
 
