@@ -1,0 +1,6 @@
+[
+	{ 
+		"keys": ["super+;", "<character>"], 
+		"command": "sublime_jump" 
+	}
+]
