@@ -31,7 +31,6 @@ class SublimeJumpCommand(sublime_plugin.WindowCommand):
         self.found_char_regions = self.find_all_in_region(visible_region, character)
 
         self.jump_character = character
-        self.edit = self.active_view.begin_edit()
 
         if len(self.found_char_regions) > 0:
             self.prompt_for_jump()
@@ -61,7 +60,10 @@ class SublimeJumpCommand(sublime_plugin.WindowCommand):
 
     def prompt_for_jump(self):
         self.transform_found_chars()
-        self.window.show_input_panel("Pick target", "", self.selected_jump_target, None, self.restore_found_chars)
+        try:
+            self.window.show_input_panel("Pick target", "", self.selected_jump_target, None, self.restore_found_chars)
+        except:
+            self.restore_found_chars()
 
     def selected_jump_target(self, selection):
         self.restore_found_chars()
@@ -80,14 +82,19 @@ class SublimeJumpCommand(sublime_plugin.WindowCommand):
             self.active_view.show(winning_point)
 
     def transform_found_chars(self):
+        if (self.edit is None):
+            self.edit = self.active_view.begin_edit()
+
         for char_region, placeholder_char in (zip(self.found_char_regions, PLACEHOLDER_CHARS)):
             self.active_view.replace(self.edit, char_region, placeholder_char)
 
         self.active_view.add_regions("jump_match_regions", self.found_char_regions, self.jump_target_scope, "dot")
 
     def restore_found_chars(self):
+        # alternatively it would be good to just end the edit and then undo it so that we havent dirtied the save state of the file
         for char_region in self.found_char_regions:
             self.active_view.replace(self.edit, char_region, self.jump_character)
 
         self.active_view.erase_regions("jump_match_regions")
         self.active_view.end_edit(self.edit)
+        self.edit = None
