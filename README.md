@@ -21,19 +21,15 @@ To use the plugin, press the SublimeJump shortcut followed by the case-sensitive
 
 So if you were editing this class, and your cursor is at the end of the file
 
-    class Complex:
-        def __init__(self, realpart, imagpart):
-            self.r = realpart
-            self.i = imagpart 
+![SublimeJump Begin](https://raw.github.com/tednaleid/SublimeJump/add_images/images/sublimejump_begin.png)
 
 if you wanted to go to the `r` in the `realpart` in the method signature, instead of hitting the up arrow twice and scrolling over to the r (or grabbing your mouse), you could press `cmd-;` followed by `r`.  That will transform your file into this:
 
-    class Complex:
-        def __init__(self, aealpabt, imagpact):
-            self.d = eealpaft
-            self.i = imagpagt 
+![SublimeJump Middle](https://raw.github.com/tednaleid/SublimeJump/add_images/images/sublimejump_middle.png)
 
 with each instance of `r` turned into one of `a-zA-Z0-9`.  It then prompts you for the one you want to go to, just press `a` and hit enter and your cursor will be at the beginning of `realpart` in the signature (and all characters will revert to their previous value).
+
+![SublimeJump Middle](https://raw.github.com/tednaleid/SublimeJump/add_images/images/sublimejump_end.png)
 
 It is currently untested on Windows and Linux.  It is also very alpha, so save early and often if you decide to use it.
 
