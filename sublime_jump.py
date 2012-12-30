@@ -18,9 +18,12 @@ class SublimeJumpCommand(sublime_plugin.WindowCommand):
     active_view = None
     edit = None
     found_char_regions = None
+    jump_target_scope = None
 
     def run(self, character=None):
         sublime.status_message("Sublime Jump to " + character)
+
+        self.jump_target_scope = sublime.load_settings("SublimeJump.sublime-settings").get('jump_target_scope', 'string')
         self.active_view = self.window.active_view()
 
         visible_region = self.active_view.visible_region()
@@ -80,7 +83,7 @@ class SublimeJumpCommand(sublime_plugin.WindowCommand):
         for char_region, placeholder_char in (zip(self.found_char_regions, PLACEHOLDER_CHARS)):
             self.active_view.replace(self.edit, char_region, placeholder_char)
 
-        self.active_view.add_regions("jump_match_regions", self.found_char_regions, "comment", "dot", sublime.DRAW_OUTLINED)
+        self.active_view.add_regions("jump_match_regions", self.found_char_regions, self.jump_target_scope, "dot")
 
     def restore_found_chars(self):
         for char_region in self.found_char_regions:
