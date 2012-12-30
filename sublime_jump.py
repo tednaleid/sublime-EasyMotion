@@ -82,6 +82,9 @@ class SublimeJumpCommand(sublime_plugin.WindowCommand):
             self.active_view.show(winning_point)
 
     def transform_found_chars(self):
+        '''
+            Start up an edit object if we don't have one already, then mark all of the jump targets
+        '''
         if (self.edit is None):
             self.edit = self.active_view.begin_edit()
 
@@ -91,10 +94,14 @@ class SublimeJumpCommand(sublime_plugin.WindowCommand):
         self.active_view.add_regions("jump_match_regions", self.found_char_regions, self.jump_target_scope, "dot")
 
     def restore_found_chars(self):
-        # alternatively it would be good to just end the edit and then undo it so that we havent dirtied the save state of the file
-        for char_region in self.found_char_regions:
-            self.active_view.replace(self.edit, char_region, self.jump_character)
-
+        '''
+            Close out the edit that we've been messing with and then undo it right away to return the buffer to
+            the pristine state that we found it in.  Other methods ended up leaving the window in a dirty save state
+            and this seems to be the cleanest way to get back to the original state
+        '''
         self.active_view.erase_regions("jump_match_regions")
-        self.active_view.end_edit(self.edit)
-        self.edit = None
+
+        if (self.edit is not None):
+            self.active_view.end_edit(self.edit)
+            self.edit = None
+            self.window.run_command("undo")
