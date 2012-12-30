@@ -1,8 +1,8 @@
 # SublimeJump
 
-SublimeJump is a (Sublime Text 2)[http://www.sublimetext.com/2] plugin that allows you to move the cursor to any character in your current view.
+SublimeJump is a [Sublime Text 2](http://www.sublimetext.com/2) plugin that allows you to move the cursor to any character in your current view.
 
-It's heavily inspired by (EasyMotion)[http://www.vim.org/scripts/script.php?script_id=3526] (vim), and (AceJump)[http://www.emacswiki.org/emacs/AceJump] (emacs).
+It's heavily inspired by [EasyMotion](http://www.vim.org/scripts/script.php?script_id=3526) (vim), and [AceJump](http://www.emacswiki.org/emacs/AceJump) (emacs).
 
 After pressing the SublimeJump shortcut, you then press the character that you'd like to jump to.  SublimeJump will then replace all currently visible instances of that character with one of `a-zA-Z0-9`.  Press the key for the one you want and your cursor will be moved right to it. 
 
