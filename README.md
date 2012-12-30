@@ -32,13 +32,3 @@ Press `a` and hit enter and your cursor will be at the beginning of `realpart` i
 ![SublimeJump Middle](https://raw.github.com/tednaleid/SublimeJump/add_images/images/sublimejump_end.png)
 
 It is currently untested on Windows and Linux.  It is also very alpha, so save early and often if you decide to use it.
-
-## TODO Features/Bugs
-
-- move on_change as you type in the window
-- if there are more than 62 matches for the case sensitive character on the screen, allow expanded selection with enter (and make selection expand out from current cursor position)
-- possibly change coloration while in jump mode to highlight matched characters and de-emphasize unmatched ones
-- any other non-kludgy input method that allows a single character to be typed without hitting enter?
-- make "." character work correctly
-- get working with selection (respect visual vintage mode? if shift pressed when using keystroke make it a selection?)
-- if there's only one on the screen jump to it
