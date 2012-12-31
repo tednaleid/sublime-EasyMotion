@@ -37,8 +37,6 @@ class JumpGroupIterator:
             else:
                 break
 
-        pprint(jump_group)
-
         return jump_group
 
     def reset(self):
@@ -92,10 +90,16 @@ class SublimeJumpCommand(sublime_plugin.WindowCommand):
         self.jump_group_iterator = JumpGroupIterator(self.active_view, character)
 
         if self.jump_group_iterator.has_next():
-            self.current_jump_group = self.jump_group_iterator.next()
-            self.prompt_for_jump()
+            self.prompt_for_next_jump_group()
         else:
             sublime.status_message("Sublime Jump: unable to find any instances of " + character + " in visible region")
+
+    def prompt_for_next_jump_group(self):
+        if not self.jump_group_iterator.has_next():
+            self.jump_group_iterator.reset()
+
+        self.current_jump_group = self.jump_group_iterator.next()
+        self.prompt_for_jump()
 
     def prompt_for_jump(self):
         self.activate_current_jump_group()
@@ -105,8 +109,11 @@ class SublimeJumpCommand(sublime_plugin.WindowCommand):
             self.deactivate_current_jump_group()
 
     def selected_jump_target(self, selection):
-        self.deactivate_current_jump_group()
-        self.jump_to(selection)
+        if len(selection) == 0:
+            self.prompt_for_next_jump_group()
+        else:
+            self.deactivate_current_jump_group()
+            self.jump_to(selection)
 
     def jump_to(self, selection):
         winning_region = self.current_jump_group[selection]
