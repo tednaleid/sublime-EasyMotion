@@ -31,6 +31,6 @@ Press `e` and hit enter and your cursor will jump right there:
 
 ![SublimeJump Middle](https://raw.github.com/tednaleid/SublimeJump/add_images/images/sublimejump_end.png)
 
-If there are more instances of your chosen character on the screen, it will only decorate the first 62 of them (`a-z` + `A-Z` + `0-9`).  If the one you want to go to isn't highlighted, just hit enter and it will highlight the next group of matches.  Keep hitting enter and it will continue to cycle through them in groups of 62.
+If your target character occurs frequently within the view, it will only decorate the first 62 of them (`a-z` + `A-Z` + `0-9`).  If the one you want to go to isn't highlighted, just hit enter and it will highlight the next group of matches.  Keep hitting enter and it will continue to cycle through them in groups of 62.
 
 It is currently untested on Windows and Linux.  It is also very alpha, so save early and often if you decide to use it.
