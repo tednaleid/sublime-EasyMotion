@@ -129,8 +129,10 @@ class SublimeJumpCommand(sublime_plugin.WindowCommand):
         '''
             Start up an edit object if we don't have one already, then create all of the jump targets
         '''
-        if (self.edit is None):
-            self.edit = self.active_view.begin_edit()
+        if (self.edit is not None):
+            self.deactivate_current_jump_group()
+
+        self.edit = self.active_view.begin_edit()
 
         for placeholder_char in self.current_jump_group.keys():
             self.active_view.replace(self.edit, self.current_jump_group[placeholder_char], placeholder_char)
