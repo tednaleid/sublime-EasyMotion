@@ -8,49 +8,61 @@ PLACEHOLDER_CHARS = (string.lowercase + string.uppercase + string.digits)
 REGEX_ESCAPE_CHARS = '\\+*()[]{}^$?|:].,'
 
 
-class SublimeJumpCommand(sublime_plugin.WindowCommand):
+class JumpGroupIterator:
     '''
-       We want a WindowCommand and not a TextComand so that we can control the edit/undo item so the user
-       can't "undo" back to a state where we've transformed their selection to a-zA-Z0-9
+       given a list of region jump targets matching the given character, can emit a series of
+       JumpGroup dictionaries
     '''
+    def __init__(self, view, character):
+        self.view = view
+        self.all_jump_targets = self.find_all_jump_targets_in_visible_region(character)
+        self.jump_target_index = 0
 
-    jump_character = None
-    active_view = None
-    edit = None
-    found_char_regions = None
-    jump_target_scope = None
-    current_jump_group = 0
+    def __iter__(self):
+        return self
 
-    def run(self, character=None):
-        sublime.status_message("Sublime Jump to " + character)
+    def has_next(self):
+        return self.jump_target_index < len(self.all_jump_targets)
 
-        self.jump_target_scope = sublime.load_settings("SublimeJump.sublime-settings").get('jump_target_scope', 'string')
-        self.active_view = self.window.active_view()
-        self.jump_character = character
+    def next(self):
+        if not self.has_next():
+            raise StopIteration
 
-        self.found_char_regions = self.find_partitioned_jump_targets_in_visible_region(character)
+        jump_group = dict()
 
-        if len(self.found_char_regions) > 0:
-            self.prompt_for_jump()
-        else:
-            sublime.status_message("Sublime Jump: unable to find any instances of " + character + " in visible region")
+        for placeholder_char in PLACEHOLDER_CHARS:
+            if self.has_next():
+                jump_group[placeholder_char] = self.all_jump_targets[self.jump_target_index]
+                self.jump_target_index += 1
+            else:
+                break
 
-    def find_partitioned_jump_targets_in_visible_region(self, character):
-        # TODO partition the visible region into a list of dictionary objects that contain jump character -> region
-        return self.find_all_jump_targets_in_visible_region(character)
+        pprint(jump_group)
+
+        return jump_group
+
+    def reset(self):
+        self.jump_target_index = 0
 
     def find_all_jump_targets_in_visible_region(self, character):
-        visible_region = self.active_view.visible_region()
-        search_text = self.active_view.substr(visible_region)
+        visible_region_begin = self.visible_region_begin()
+        visible_text = self.visible_text()
         matching_regions = []
-        region_begin = visible_region.begin()
         escaped_character = self.escape_character(character)
 
-        for char_at in (match.start() for match in re.finditer(escaped_character, search_text)):
-            char_point = char_at + region_begin
+        for char_at in (match.start() for match in re.finditer(escaped_character, visible_text)):
+            char_point = char_at + visible_region_begin
             matching_regions.append(sublime.Region(char_point, char_point + 1))
 
         return matching_regions
+
+    def visible_region_begin(self):
+        return self.view.visible_region().begin()
+
+    def visible_text(self):
+        # TODO enhance to be aware of collapsed text blocks
+        visible_region = self.view.visible_region()
+        return self.view.substr(visible_region)
 
     def escape_character(self, character):
         if (REGEX_ESCAPE_CHARS.find(character) >= 0):
@@ -58,42 +70,67 @@ class SublimeJumpCommand(sublime_plugin.WindowCommand):
         else:
             return character
 
+
+class SublimeJumpCommand(sublime_plugin.WindowCommand):
+    '''
+       We want a WindowCommand and not a TextComand so that we can control the edit/undo item so the user
+       can't "undo" back to a state where we've transformed their selection to a-zA-Z0-9
+    '''
+
+    active_view = None
+    edit = None
+    jump_target_scope = None
+    jump_group_iterator = None
+    current_jump_group = None
+
+    def run(self, character=None):
+        sublime.status_message("SublimeJump to " + character)
+
+        self.jump_target_scope = sublime.load_settings("SublimeJump.sublime-settings").get('jump_target_scope', 'string')
+        self.active_view = self.window.active_view()
+
+        self.jump_group_iterator = JumpGroupIterator(self.active_view, character)
+
+        if self.jump_group_iterator.has_next():
+            self.current_jump_group = self.jump_group_iterator.next()
+            self.prompt_for_jump()
+        else:
+            sublime.status_message("Sublime Jump: unable to find any instances of " + character + " in visible region")
+
     def prompt_for_jump(self):
-        self.transform_found_chars()
+        self.activate_current_jump_group()
         try:
-            self.window.show_input_panel("Pick target", "", self.selected_jump_target, None, self.restore_found_chars)
+            self.window.show_input_panel("Pick jump target", "", self.selected_jump_target, None, self.deactivate_current_jump_group)
         except:
-            self.restore_found_chars()
+            self.deactivate_current_jump_group()
 
     def selected_jump_target(self, selection):
-        self.restore_found_chars()
+        self.deactivate_current_jump_group()
         self.jump_to(selection)
 
     def jump_to(self, selection):
-        winning_index = PLACEHOLDER_CHARS.find(selection)
+        winning_region = self.current_jump_group[selection]
 
-        if (winning_index >= 0):
-            winning_region = self.found_char_regions[winning_index]
+        if winning_region is not None:
             winning_point = winning_region.begin()
-
             view_sel = self.active_view.sel()
             view_sel.clear()
             view_sel.add(winning_point)
             self.active_view.show(winning_point)
 
-    def transform_found_chars(self):
+    def activate_current_jump_group(self):
         '''
-            Start up an edit object if we don't have one already, then mark all of the jump targets
+            Start up an edit object if we don't have one already, then create all of the jump targets
         '''
         if (self.edit is None):
             self.edit = self.active_view.begin_edit()
 
-        for char_region, placeholder_char in (zip(self.found_char_regions, PLACEHOLDER_CHARS)):
-            self.active_view.replace(self.edit, char_region, placeholder_char)
+        for placeholder_char in self.current_jump_group.keys():
+            self.active_view.replace(self.edit, self.current_jump_group[placeholder_char], placeholder_char)
 
-        self.active_view.add_regions("jump_match_regions", self.found_char_regions, self.jump_target_scope, "dot")
+        self.active_view.add_regions("jump_match_regions", self.current_jump_group.values(), self.jump_target_scope, "dot")
 
-    def restore_found_chars(self):
+    def deactivate_current_jump_group(self):
         '''
             Close out the edit that we've been messing with and then undo it right away to return the buffer to
             the pristine state that we found it in.  Other methods ended up leaving the window in a dirty save state
