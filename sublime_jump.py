@@ -19,31 +19,31 @@ class SublimeJumpCommand(sublime_plugin.WindowCommand):
     edit = None
     found_char_regions = None
     jump_target_scope = None
+    current_jump_group = 0
 
     def run(self, character=None):
         sublime.status_message("Sublime Jump to " + character)
 
         self.jump_target_scope = sublime.load_settings("SublimeJump.sublime-settings").get('jump_target_scope', 'string')
         self.active_view = self.window.active_view()
-
-        visible_region = self.active_view.visible_region()
-
-        self.found_char_regions = self.find_all_in_region(visible_region, character)
-
         self.jump_character = character
+
+        self.found_char_regions = self.find_partitioned_jump_targets_in_visible_region(character)
 
         if len(self.found_char_regions) > 0:
             self.prompt_for_jump()
         else:
             sublime.status_message("Sublime Jump: unable to find any instances of " + character + " in visible region")
 
-    def find_all_in_region(self, region, character):
-        '''
-            Finds all occurrences of text in given region and returns an array of matching regions
-        '''
-        search_text = self.active_view.substr(region)
+    def find_partitioned_jump_targets_in_visible_region(self, character):
+        # TODO partition the visible region into a list of dictionary objects that contain jump character -> region
+        return self.find_all_jump_targets_in_visible_region(character)
+
+    def find_all_jump_targets_in_visible_region(self, character):
+        visible_region = self.active_view.visible_region()
+        search_text = self.active_view.substr(visible_region)
         matching_regions = []
-        region_begin = region.begin()
+        region_begin = visible_region.begin()
         escaped_character = self.escape_character(character)
 
         for char_at in (match.start() for match in re.finditer(escaped_character, search_text)):
