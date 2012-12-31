@@ -23,12 +23,14 @@ So if you were editing this class, and your cursor is at the end of the file
 
 ![SublimeJump Begin](https://raw.github.com/tednaleid/SublimeJump/add_images/images/sublimejump_begin.png)
 
-if you wanted to go to the `r` in the `realpart` in the method signature, instead of hitting the up arrow three times and scrolling over to the r (or grabbing your mouse), you could press `cmd-;` followed by `r`.  That will transform your file into this (notice that each instance of `r` has been turned into one of `a-zA-Z0-9`):
+if you wanted to go to the beginning of the `realpart` variable on line 3, instead of hitting the up arrow twice and scrolling over to the r (or grabbing your mouse), you could press `cmd-;` followed by `r`.  That will transform your file into this (notice that each instance of `r` has been turned into one of `a-zA-Z0-9`):
 
 ![SublimeJump Middle](https://raw.github.com/tednaleid/SublimeJump/add_images/images/sublimejump_middle.png)
 
-Press `a` and hit enter and your cursor will be at the beginning of `realpart` in the signature (and all characters will revert to their previous value).
+Press `e` and hit enter and your cursor will jump right there:
 
 ![SublimeJump Middle](https://raw.github.com/tednaleid/SublimeJump/add_images/images/sublimejump_end.png)
+
+If there are more instances of your chosen character on the screen, it will only decorate the first 62 of them (`a-z` + `A-Z` + `0-9`).  If the one you want to go to isn't highlighted, just hit enter and it will highlight the next group of matches.  Keep hitting enter and it will continue to cycle through them in groups of 62.
 
 It is currently untested on Windows and Linux.  It is also very alpha, so save early and often if you decide to use it.
