@@ -47,6 +47,8 @@ If your target character occurs more than 62 times in the visible area, it will 
 
 it will label all instances of that character with a unique value in `a-zA-Z0-9`, type it and it will select all text between your current cursor position and the chosen jump target.
 
-So in the same example as above, if we had hit `cmd-shift-;` followed by `r` and picked the `e` target that occurs at the start of the `imagpart` variable on line 3, we would end up with this:
+#### Example
+
+So in the same situation as above, if we had hit `cmd-shift-;` followed by `r` and picked the `e` target that occurs at the start of the `imagpart` variable on line 3, we would end up with this:
 
 ![SublimeJump Select](https://raw.github.com/tednaleid/SublimeJump/add_images/images/sublimejump_select.png)
