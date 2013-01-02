@@ -8,7 +8,7 @@ After pressing the SublimeJump shortcut, you then press the character that you'd
 
 ## Installation
 
-After SublimeJump is officially released, it will be put in Package Control, but it's not ready for primetime yet so installation is currently manual.
+SublimeJump has been [submitted to PackageControl](https://github.com/wbond/package_control_channel/pull/929), but has not yet been merged yet so the installation process is currently manual.
 
 Manual installation should be as easy as cloning this git repository into your Sublime `Packages` directory.  On OSX:
 
