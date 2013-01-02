@@ -80,12 +80,14 @@ class SublimeJumpCommand(sublime_plugin.WindowCommand):
     jump_target_scope = None
     jump_group_iterator = None
     current_jump_group = None
+    select_text = False
 
-    def run(self, character=None):
+    def run(self, character=None, select_text=False):
         sublime.status_message("SublimeJump to " + character)
 
         self.jump_target_scope = sublime.load_settings("SublimeJump.sublime-settings").get('jump_target_scope', 'string')
         self.active_view = self.window.active_view()
+        self.select_text = select_text
 
         self.jump_group_iterator = JumpGroupIterator(self.active_view, character)
 
@@ -116,14 +118,25 @@ class SublimeJumpCommand(sublime_plugin.WindowCommand):
             self.jump_to(selection)
 
     def jump_to(self, selection):
+        winning_selection = self.winning_selection_from(selection)
+
+        if winning_selection is not None:
+            view_sel = self.active_view.sel()
+            view_sel.clear()
+            view_sel.add(winning_selection)
+            self.active_view.show(winning_selection)
+
+    def winning_selection_from(self, selection):
         winning_region = self.current_jump_group[selection]
 
         if winning_region is not None:
             winning_point = winning_region.begin()
-            view_sel = self.active_view.sel()
-            view_sel.clear()
-            view_sel.add(winning_point)
-            self.active_view.show(winning_point)
+            if self.select_text:
+                for selection in self.active_view.sel():
+                    # take the first one, we don't care about the others for this selection
+                    return sublime.Region(winning_point, selection.begin())
+            else:
+                return winning_point
 
     def activate_current_jump_group(self):
         '''

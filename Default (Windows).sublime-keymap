@@ -1,6 +1,12 @@
 [
     { 
         "keys": ["ctrl+;", "<character>"], 
-        "command": "sublime_jump" 
+        "command": "sublime_jump",
+        "args": {"select_text": false} 
+    },
+    { 
+        "keys": ["ctrl+shift+;", "<character>"], 
+        "command": "sublime_jump",
+        "args": {"select_text": true} 
     }
 ]
