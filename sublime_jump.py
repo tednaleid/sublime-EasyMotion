@@ -133,8 +133,9 @@ class SublimeJumpCommand(sublime_plugin.WindowCommand):
             winning_point = winning_region.begin()
             if self.select_text:
                 for selection in self.active_view.sel():
-                    # take the first one, we don't care about the others for this selection
+                    pprint(selection)
                     return sublime.Region(winning_point, selection.begin())
+
             else:
                 return winning_point
 
@@ -143,9 +144,11 @@ class SublimeJumpCommand(sublime_plugin.WindowCommand):
             Start up an edit object if we don't have one already, then create all of the jump targets
         '''
         if (self.edit is not None):
-            self.deactivate_current_jump_group()
-
-        self.edit = self.active_view.begin_edit()
+            # normally would call deactivate_current_jump_group here, but apparent ST2 bug prevents it from calling undo correctly
+            # instead just decorate the new character and keep the same edit object so all changes get undone properly
+            self.active_view.erase_regions("jump_match_regions")
+        else:
+            self.edit = self.active_view.begin_edit()
 
         for placeholder_char in self.current_jump_group.keys():
             self.active_view.replace(self.edit, self.current_jump_group[placeholder_char], placeholder_char)
@@ -158,9 +161,10 @@ class SublimeJumpCommand(sublime_plugin.WindowCommand):
             the pristine state that we found it in.  Other methods ended up leaving the window in a dirty save state
             and this seems to be the cleanest way to get back to the original state
         '''
-        self.active_view.erase_regions("jump_match_regions")
 
         if (self.edit is not None):
             self.active_view.end_edit(self.edit)
-            self.edit = None
             self.window.run_command("undo")
+            self.edit = None
+
+        self.active_view.erase_regions("jump_match_regions")
