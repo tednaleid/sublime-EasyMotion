@@ -77,7 +77,7 @@ You can remap your keys to be something other than the defaults by entering an o
 
 ### Overriding the placeholder characters used for jumping
 
-Add this to your "User Settings" file and change the string to contain whatever characters you'd like to use:
+Add this to your "User Settings" file (found at "Sublime Text 2 -> Preferences -> Settings - User" on OSX) and change the string to contain whatever characters you'd like to use:
 
     // define the characters that we can jump to, in the order that they'll appear, they should be unique
     "placeholder_chars" : "abcdefghijklmnopqrstuvwxyz01234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ"
