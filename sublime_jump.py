@@ -4,7 +4,6 @@ import re
 import string
 from pprint import pprint
 
-PLACEHOLDER_CHARS = (string.lowercase + string.uppercase + string.digits)
 REGEX_ESCAPE_CHARS = '\\+*()[]{}^$?|:].,'
 
 
@@ -13,10 +12,11 @@ class JumpGroupIterator:
        given a list of region jump targets matching the given character, can emit a series of
        JumpGroup dictionaries
     '''
-    def __init__(self, view, character):
+    def __init__(self, view, character, placeholder_chars):
         self.view = view
         self.all_jump_targets = self.find_all_jump_targets_in_visible_region(character)
         self.jump_target_index = 0
+        self.placeholder_chars = placeholder_chars
 
     def __iter__(self):
         return self
@@ -30,7 +30,7 @@ class JumpGroupIterator:
 
         jump_group = dict()
 
-        for placeholder_char in PLACEHOLDER_CHARS:
+        for placeholder_char in self.placeholder_chars:
             if self.has_next():
                 jump_group[placeholder_char] = self.all_jump_targets[self.jump_target_index]
                 self.jump_target_index += 1
@@ -85,11 +85,14 @@ class SublimeJumpCommand(sublime_plugin.WindowCommand):
     def run(self, character=None, select_text=False):
         sublime.status_message("SublimeJump to " + character)
 
-        self.jump_target_scope = sublime.load_settings("SublimeJump.sublime-settings").get('jump_target_scope', 'string')
+        settings = sublime.load_settings("Preferences.sublime-settings")
+
+        self.jump_target_scope = settings.get('jump_target_scope', 'string')
+        placeholder_chars = settings.get('placeholder_chars', 'string')
         self.active_view = self.window.active_view()
         self.select_text = select_text
 
-        self.jump_group_iterator = JumpGroupIterator(self.active_view, character)
+        self.jump_group_iterator = JumpGroupIterator(self.active_view, character, placeholder_chars)
 
         if self.jump_group_iterator.has_next():
             self.prompt_for_next_jump_group()

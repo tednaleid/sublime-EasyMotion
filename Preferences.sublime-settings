@@ -1,0 +1,8 @@
+{
+    // defines syntax highlighting scope that will be used to highlight matched jump targets
+    // other examples include: keyword, string, number
+    "jump_target_scope" : "entity.name.class",
+
+    // define the characters that we can jump to, in the order that they'll appear, they should be unique
+    "placeholder_chars" : "abcdefghijklmnopqrstuvwxyz01234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+}
