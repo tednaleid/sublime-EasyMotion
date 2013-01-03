@@ -52,3 +52,45 @@ it will label all instances of that character with a unique value in `a-zA-Z0-9`
 So in the same situation as above, if we had hit `cmd-shift-;` followed by `r` and picked the `e` target that occurs at the start of the `imagpart` variable on line 3, we would end up with this:
 
 ![SublimeJump Select](https://raw.github.com/tednaleid/SublimeJump/add_images/images/sublimejump_select.png)
+
+
+## User Modifiable Preferences
+
+### Remapping the SublimeJump keyboard shortcut
+
+You can remap your keys to be something other than the defaults by entering an override value into your "User - KeyBindings" (under Sublime Text 2 -> Preferences on OSX), just make sure to copy the existing key bindings exactly and change only the first item in the `keys` stanza, otherwise it won't work.  So if you wanted the jump command to be `ctrl-,`, you'd use:
+
+
+    [
+        { 
+            "keys": ["ctrl+,", "<character>"], 
+            "command": "sublime_jump",
+            "args": {"select_text": false} 
+        },
+        { 
+            "keys": ["ctrl+shift+,", "<character>"], 
+            "command": "sublime_jump",
+            "args": {"select_text": true} 
+        }
+    ]
+
+
+### Overriding the placeholder characters used for jumping
+
+Add this to your "User Settings" file and change the string to contain whatever characters you'd like to use:
+
+    // define the characters that we can jump to, in the order that they'll appear, they should be unique
+    "placeholder_chars" : "abcdefghijklmnopqrstuvwxyz01234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    
+example using only QWERTY home-row replacements:
+
+    "placeholder_chars" : "jkl;asdfHGJKL:ASDFHG"
+
+### Override the highlight color for jump targets
+    
+If the highlight color used for jump targets isn't bold enough if your color scheme, you can override it by changing this "User Setting":
+
+    // defines syntax highlighting scope that will be used to highlight matched jump targets
+    // other examples include: keyword, string, number
+    "jump_target_scope" : "entity.name.class"
+
