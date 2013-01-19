@@ -2,7 +2,7 @@
 
 EasyMotion is a [Sublime Text 2](http://www.sublimetext.com/2) plugin that allows you to move the cursor to any character in your current view.
 
-It's heavily inspired by [Vim's EasyMotion](http://www.vim.org/scripts/script.php?script_id=3526), and [Emac's AceJump](http://www.emacswiki.org/emacs/AceJump) plugins.
+It's heavily inspired by [Vim's EasyMotion](http://www.vim.org/scripts/script.php?script_id=3526), and [Emacs' AceJump](http://www.emacswiki.org/emacs/AceJump) plugins.
 
 After pressing the EasyMotion shortcut (default `cmd-;`/`ctrl-;`), you then press the character that you'd like to jump to.  EasyMotion will then replace all currently visible instances of that character with one of `a-zA-Z0-9`.  Press the key for the one you want and your cursor will be moved right to it. 
 
