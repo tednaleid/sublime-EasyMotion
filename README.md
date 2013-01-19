@@ -1,19 +1,23 @@
-# SublimeJump
+# Sublime EasyMotion
 
-SublimeJump is a [Sublime Text 2](http://www.sublimetext.com/2) plugin that allows you to move the cursor to any character in your current view.
+EasyMotion is a [Sublime Text 2](http://www.sublimetext.com/2) plugin that allows you to move the cursor to any character in your current view.
 
-It's heavily inspired by [EasyMotion](http://www.vim.org/scripts/script.php?script_id=3526) (vim), and [AceJump](http://www.emacswiki.org/emacs/AceJump) (emacs).
+It's heavily inspired by [Vim's EasyMotion](http://www.vim.org/scripts/script.php?script_id=3526), and [Emac's AceJump](http://www.emacswiki.org/emacs/AceJump) plugins.
 
-After pressing the SublimeJump shortcut, you then press the character that you'd like to jump to.  SublimeJump will then replace all currently visible instances of that character with one of `a-zA-Z0-9`.  Press the key for the one you want and your cursor will be moved right to it. 
+After pressing the EasyMotion shortcut (default `cmd-;`/`ctrl-;`), you then press the character that you'd like to jump to.  EasyMotion will then replace all currently visible instances of that character with one of `a-zA-Z0-9`.  Press the key for the one you want and your cursor will be moved right to it. 
 
 ## Installation
 
-SublimeJump has been [submitted to PackageControl](https://github.com/wbond/package_control_channel/pull/929), but has not yet been merged yet so the installation process is currently manual.
+Sublime EasyMotion has been [submitted to PackageControl](https://github.com/wbond/package_control_channel/pull/929)
+
+Once it is merged, you should be able to use PackageControl to install the `EasyMotion` plugin.
+
+It has not yet been merged yet so the installation process is currently manual only.
 
 Manual installation should be as easy as cloning this git repository into your Sublime `Packages` directory.  On OSX:
 
     cd ~/Application\ Support/Sublime\ Text\ 2/Packages
-    git clone git://github.com/tednaleid/SublimeJump.git
+    git clone git://github.com/tednaleid/sublime-EasyMotion.git
 
 ## Usage
 
@@ -28,15 +32,15 @@ it will label all instances of that character with a unique value in `a-zA-Z0-9`
 
 The cursor is at the end of the file and we want to jump to the beginning of the `realpart` variable on line 3
 
-![SublimeJump Begin](https://raw.github.com/tednaleid/SublimeJump/add_images/images/sublimejump_begin.png)
+![EasyMotion Begin](https://raw.github.com/tednaleid/sublime-EasyMotion/add_images/images/sublimejump_begin.png)
 
 Instead of hitting the up arrow twice and scrolling over to the r (or grabbing your mouse), you could press `cmd-;` followed by `r`.  That will transform your file into this (notice that each instance of `r` has been turned into one of `a-zA-Z0-9`):
 
-![SublimeJump Middle](https://raw.github.com/tednaleid/SublimeJump/add_images/images/sublimejump_middle.png)
+![EasyMotion Middle](https://raw.github.com/tednaleid/sublime-EasyMotion/add_images/images/sublimejump_middle.png)
 
 Press `e` and hit enter and your cursor will jump right there:
 
-![SublimeJump Middle](https://raw.github.com/tednaleid/SublimeJump/add_images/images/sublimejump_end.png)
+![EasyMotion Middle](https://raw.github.com/tednaleid/sublime-EasyMotion/add_images/images/sublimejump_end.png)
 
 If your target character occurs more than 62 times in the visible area, it will decorate them in batches.  Just hit `enter` and it will highlight the next group of matches.  Keep hitting enter and it will continue to cycle through them in groups of 62.
 
@@ -51,12 +55,12 @@ it will label all instances of that character with a unique value in `a-zA-Z0-9`
 
 So in the same situation as above, if we had hit `cmd-shift-;` followed by `r` and picked the `e` target that occurs at the start of the `imagpart` variable on line 3, we would end up with this:
 
-![SublimeJump Select](https://raw.github.com/tednaleid/SublimeJump/add_images/images/sublimejump_select.png)
+![EasyMotion Select](https://raw.github.com/tednaleid/sublime-EasyMotion/add_images/images/sublimejump_select.png)
 
 
 ## User Modifiable Preferences
 
-### Remapping the SublimeJump keyboard shortcut
+### Remapping the Sublime EasyMotion keyboard shortcut
 
 You can remap your keys to be something other than the defaults by entering an override value into your "User - KeyBindings" (under Sublime Text 2 -> Preferences on OSX), just make sure to copy the existing key bindings exactly and change only the first item in the `keys` stanza, otherwise it won't work.  So if you wanted the jump command to be `ctrl-,`, you'd use:
 
@@ -64,12 +68,12 @@ You can remap your keys to be something other than the defaults by entering an o
     [
         { 
             "keys": ["ctrl+,", "<character>"], 
-            "command": "sublime_jump",
+            "command": "easy_motion",
             "args": {"select_text": false} 
         },
         { 
             "keys": ["ctrl+shift+,", "<character>"], 
-            "command": "sublime_jump",
+            "command": "easy_motion",
             "args": {"select_text": true} 
         }
     ]
