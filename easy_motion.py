@@ -69,7 +69,7 @@ class JumpGroupIterator:
             return character
 
 
-class SublimeJumpCommand(sublime_plugin.WindowCommand):
+class EasyMotionCommand(sublime_plugin.WindowCommand):
     '''
        We want a WindowCommand and not a TextComand so that we can control the edit/undo item so the user
        can't "undo" back to a state where we've transformed their selection to a-zA-Z0-9
@@ -97,7 +97,7 @@ class SublimeJumpCommand(sublime_plugin.WindowCommand):
         if self.jump_group_iterator.has_next():
             self.prompt_for_next_jump_group()
         else:
-            sublime.status_message("Sublime Jump: unable to find any instances of " + character + " in visible region")
+            sublime.status_message("EasyMotion: unable to find any instances of " + character + " in visible region")
 
     def prompt_for_next_jump_group(self):
         if not self.jump_group_iterator.has_next():

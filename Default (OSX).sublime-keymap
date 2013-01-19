@@ -1,12 +1,12 @@
 [
 	{ 
 		"keys": ["super+;", "<character>"], 
-		"command": "sublime_jump",
+		"command": "easy_motion",
         "args": {"select_text": false}
 	},
     { 
         "keys": ["super+shift+;", "<character>"], 
-        "command": "sublime_jump",
+        "command": "easy_motion",
         "args": {"select_text": true}
     }
 ]
