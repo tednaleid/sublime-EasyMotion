@@ -127,7 +127,7 @@ class EasyMotionCommand(sublime_plugin.WindowCommand):
     def prompt_for_jump(self):
         self.activate_current_jump_group()
         try:
-            self.window.show_input_panel("Pick jump target", "", self.enter_pressed, self.picked_target, self.deactivate_current_jump_group)
+            self.window.show_input_panel("Pick jump target", "", self.enter_pressed, self.picked_target, self.finish_easy_motion)
         except:
             self.deactivate_current_jump_group()
 
@@ -173,20 +173,26 @@ class EasyMotionCommand(sublime_plugin.WindowCommand):
 
         self.active_view.add_regions("jump_match_regions", self.current_jump_group.values(), self.jump_target_scope, "dot")
 
+    def finish_easy_motion(self):
+        '''
+        We need to clean up after ourselves by restoring the view to it's original state, if the user did
+        press a jump target that we've got saved, jump to it as the last action
+        '''
+        self.deactivate_current_jump_group()
+        self.jump_to_winning_selection()
+
     def deactivate_current_jump_group(self):
         '''
             Close out the edit that we've been messing with and then undo it right away to return the buffer to
             the pristine state that we found it in.  Other methods ended up leaving the window in a dirty save state
             and this seems to be the cleanest way to get back to the original state
         '''
-
         if (self.edit is not None):
             self.active_view.end_edit(self.edit)
             self.window.run_command("undo")
             self.edit = None
 
         self.active_view.erase_regions("jump_match_regions")
-        self.jump_to_winning_selection()
 
     def jump_to_winning_selection(self):
         if self.winning_selection is not None:
@@ -194,4 +200,3 @@ class EasyMotionCommand(sublime_plugin.WindowCommand):
             view_sel.clear()
             view_sel.add(self.winning_selection)
             self.active_view.show(self.winning_selection)
-
