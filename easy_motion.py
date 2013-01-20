@@ -106,7 +106,7 @@ class EasyMotionCommand(sublime_plugin.WindowCommand):
         settings = sublime.load_settings("Preferences.sublime-settings")
 
         self.jump_target_scope = settings.get('jump_target_scope', 'string')
-        placeholder_chars = settings.get('placeholder_chars', 'string')
+        placeholder_chars = settings.get('placeholder_chars', 'abcdefghijklmnopqrstuvwxyz01234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ')
         self.active_view = self.window.active_view()
         self.select_text = select_text
 
@@ -143,7 +143,9 @@ class EasyMotionCommand(sublime_plugin.WindowCommand):
             self.window.run_command("hide_panel")
 
     def winning_selection_from(self, selection):
-        winning_region = self.current_jump_group[selection]
+        winning_region = None
+        if selection in self.current_jump_group:
+            winning_region = self.current_jump_group[selection]
 
         if winning_region is not None:
             winning_point = winning_region.begin()
