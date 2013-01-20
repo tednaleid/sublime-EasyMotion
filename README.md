@@ -29,7 +29,7 @@ Manual installation should be as easy as cloning this git repository into your S
     cmd-;   <character>   // OSX
     ctrl-;  <character>   // Linux/Windows
     
-it will label all instances of that character with a unique value in `a-zA-Z0-9`, type it and it will jump you to it.
+it will label all instances of that character with a unique value in `a-zA-Z0-9`, type the label you want and it will jump you to it.
 
 #### Example
 
@@ -41,11 +41,25 @@ Instead of hitting the up arrow twice and scrolling over to the r (or grabbing y
 
 ![EasyMotion Middle](https://raw.github.com/tednaleid/sublime-EasyMotion/add_images/images/sublimejump_middle.png)
 
-Press `e` and hit enter and your cursor will jump right there:
+Press `e` and your cursor will jump right there:
 
 ![EasyMotion Middle](https://raw.github.com/tednaleid/sublime-EasyMotion/add_images/images/sublimejump_end.png)
 
-If your target character occurs more than 62 times in the visible area, it will decorate them in batches.  Just hit `enter` and it will highlight the next group of matches.  Keep hitting enter and it will continue to cycle through them in groups of 62.
+If your target character occurs more than 62 times in the visible area, it will decorate them in batches.  
+
+So if we search this for the letter `l` using `cmd-;`+`l`
+
+![Many Matches Start](https://raw.github.com/tednaleid/sublime-EasyMotion/add_images/images/many_matches_start.png)
+
+The first batch of 62 targets will look like this:
+
+![Many Matches First](https://raw.github.com/tednaleid/sublime-EasyMotion/add_images/images/many_matches_first.png)
+
+**Just hit `enter` and it will highlight the next group of matches.**  
+
+![Many Matches Second](https://raw.github.com/tednaleid/sublime-EasyMotion/add_images/images/many_matches_second.png)
+
+Keep hitting `enter` and it will continue to cycle through them in groups of 62.
 
 ### Select all text between cursor and any visible character
 
