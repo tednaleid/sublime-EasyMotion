@@ -8,11 +8,14 @@ After pressing the EasyMotion shortcut (default `cmd-;`/`ctrl-;`), you then pres
 
 ## Installation
 
-Sublime EasyMotion has been [submitted to PackageControl](https://github.com/wbond/package_control_channel/pull/929)
+### Install via PackageControl
+If you have the [PackageControl](http://wbond.net/sublime_packages/package_control) plugin installed, you can use that to install `EasyMotion`.
 
-Once it is merged, you should be able to use PackageControl to install the `EasyMotion` plugin.
+Just type `cmd-shift-p` (`ctrl-shift-p` on win/linux) to bring up the command pallate then type `install` and pick `Package Control: Install Package` from the dropdown.
 
-It has not yet been merged yet so the installation process is currently manual only.
+Then type `EasyMotion` and choose the EasyMotion plugin from the dropdown.  Hit `enter` and it will install.
+
+### Manual Installation
 
 Manual installation should be as easy as cloning this git repository into your Sublime `Packages` directory.  On OSX:
 
