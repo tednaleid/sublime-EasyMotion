@@ -127,25 +127,20 @@ class EasyMotionCommand(sublime_plugin.WindowCommand):
     def prompt_for_jump(self):
         self.activate_current_jump_group()
         try:
-            self.window.show_input_panel("Pick jump target", "", self.selected_jump_target, None, self.deactivate_current_jump_group)
+            self.window.show_input_panel("Pick jump target", "", self.enter_pressed, self.picked_target, self.deactivate_current_jump_group)
         except:
             self.deactivate_current_jump_group()
 
-    def selected_jump_target(self, selection):
-        if len(selection) == 0:
-            self.prompt_for_next_jump_group()
-        else:
-            self.deactivate_current_jump_group()
-            self.jump_to(selection)
+    def enter_pressed(self, selection):
+        # shouldn't get here unless the user hit enter, other selections should go through on_change branch
+        self.prompt_for_next_jump_group()
 
-    def jump_to(self, selection):
-        winning_selection = self.winning_selection_from(selection)
-
-        if winning_selection is not None:
-            view_sel = self.active_view.sel()
-            view_sel.clear()
-            view_sel.add(winning_selection)
-            self.active_view.show(winning_selection)
+    def picked_target(self, selection):
+        if len(selection) > 0:
+            # this will get used when hide_panel calls through to jump_to_winning_selection
+            # can't call directly because of race condition
+            self.winning_selection = self.winning_selection_from(selection)
+            self.window.run_command("hide_panel")
 
     def winning_selection_from(self, selection):
         winning_region = self.current_jump_group[selection]
@@ -189,3 +184,12 @@ class EasyMotionCommand(sublime_plugin.WindowCommand):
             self.edit = None
 
         self.active_view.erase_regions("jump_match_regions")
+        self.jump_to_winning_selection()
+
+    def jump_to_winning_selection(self):
+        if self.winning_selection is not None:
+            view_sel = self.active_view.sel()
+            view_sel.clear()
+            view_sel.add(self.winning_selection)
+            self.active_view.show(self.winning_selection)
+
