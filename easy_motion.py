@@ -45,20 +45,29 @@ class JumpGroupIterator:
     def find_all_jump_targets_in_visible_region(self, character):
         visible_region_begin = self.visible_region_begin()
         visible_text = self.visible_text()
+        folded_regions = self.get_folded_regions(self.view)
         matching_regions = []
         escaped_character = self.escape_character(character)
 
         for char_at in (match.start() for match in re.finditer(escaped_character, visible_text)):
             char_point = char_at + visible_region_begin
-            matching_regions.append(sublime.Region(char_point, char_point + 1))
+            char_region = sublime.Region(char_point, char_point + 1)
+            if not self.region_list_contains_region(folded_regions, char_region):
+                matching_regions.append(char_region)
 
         return matching_regions
+
+    def region_list_contains_region(self, region_list, region):
+
+        for element_region in region_list:
+            if element_region.contains(region):
+                return True
+        return False
 
     def visible_region_begin(self):
         return self.view.visible_region().begin()
 
     def visible_text(self):
-        # TODO enhance to be aware of collapsed text blocks
         visible_region = self.view.visible_region()
         return self.view.substr(visible_region)
 
@@ -67,6 +76,15 @@ class JumpGroupIterator:
             return '\\' + character
         else:
             return character
+
+    def get_folded_regions(self, view):
+        '''
+        No way in the API to get the folded regions without unfolding them first
+        seems to be quick enough that you can't actually see them fold/unfold
+        '''
+        folded_regions = view.unfold(view.visible_region())
+        view.fold(folded_regions)
+        return folded_regions
 
 
 class EasyMotionCommand(sublime_plugin.WindowCommand):
