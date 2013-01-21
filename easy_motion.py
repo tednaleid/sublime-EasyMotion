@@ -151,7 +151,7 @@ class EasyMotionCommand(sublime_plugin.WindowCommand):
             if self.select_text:
                 for current_selection in self.active_view.sel():
                     if winning_region.begin() < current_selection.begin():
-                        return sublime.Region(winning_region.begin(), current_selection.end())
+                        return sublime.Region(current_selection.end(), winning_region.begin())
                     else:
                         return sublime.Region(current_selection.begin(), winning_region.end())
             else:
@@ -196,10 +196,16 @@ class EasyMotionCommand(sublime_plugin.WindowCommand):
 
     def jump_to_winning_selection(self):
         if self.winning_selection is not None:
-            self.active_view.run_command('jump_to_winning_selection', {'new_sel': self.winning_selection})
+            if isinstance(self.winning_selection, long):
+                self.active_view.run_command("jump_to_winning_selection", {"a": self.winning_selection})
+            elif isinstance(self.winning_selection, sublime.Region):
+                self.active_view.run_command("jump_to_winning_selection", {"a": self.winning_selection.a, "b": self.winning_selection.b})
 
 class JumpToWinningSelection(sublime_plugin.TextCommand):
-    def run(self, edit, new_sel):
+    def run(self, edit, a, b=None):
         sel = self.view.sel()
         sel.clear()
-        sel.add(long(new_sel))
+        if b is None:
+            sel.add(long(a))
+        else:
+            sel.add(sublime.Region(long(a), long(b)))
