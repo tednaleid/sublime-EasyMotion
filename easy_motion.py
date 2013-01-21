@@ -196,7 +196,10 @@ class EasyMotionCommand(sublime_plugin.WindowCommand):
 
     def jump_to_winning_selection(self):
         if self.winning_selection is not None:
-            view_sel = self.active_view.sel()
-            view_sel.clear()
-            view_sel.add(self.winning_selection)
-            self.active_view.show(self.winning_selection)
+            self.active_view.run_command('jump_to_winning_selection', {'new_sel': self.winning_selection})
+
+class JumpToWinningSelection(sublime_plugin.TextCommand):
+    def run(self, edit, new_sel):
+        sel = self.view.sel()
+        sel.clear()
+        sel.add(long(new_sel))
