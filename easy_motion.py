@@ -148,14 +148,15 @@ class EasyMotionCommand(sublime_plugin.WindowCommand):
             winning_region = self.current_jump_group[selection]
 
         if winning_region is not None:
-            winning_point = winning_region.begin()
             if self.select_text:
-                for selection in self.active_view.sel():
-                    pprint(selection)
-                    return sublime.Region(winning_point, selection.begin())
-
+                pprint(self.active_view.sel())
+                for current_selection in self.active_view.sel():
+                    if winning_region.begin() < current_selection.begin():
+                        return sublime.Region(winning_region.begin(), current_selection.end())
+                    else:
+                        return sublime.Region(current_selection.begin(), winning_region.end())
             else:
-                return winning_point
+                return winning_region.begin()
 
     def activate_current_jump_group(self):
         '''
