@@ -149,7 +149,6 @@ class EasyMotionCommand(sublime_plugin.WindowCommand):
 
         if winning_region is not None:
             if self.select_text:
-                pprint(self.active_view.sel())
                 for current_selection in self.active_view.sel():
                     if winning_region.begin() < current_selection.begin():
                         return sublime.Region(winning_region.begin(), current_selection.end())
