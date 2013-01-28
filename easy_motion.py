@@ -2,10 +2,19 @@ import sublime
 import sublime_plugin
 import re
 import string
-from itertools import izip_longest 
+from itertools import izip_longest
 from pprint import pprint
 
 REGEX_ESCAPE_CHARS = '\\+*()[]{}^$?|:].,'
+
+# not a fan of using globals like this, but not sure if there's a better way with the plugin
+# API that ST2 provides.  Tried attaching as fields to active_view, but didn't persiste, I'm guessing
+# it's just a representation of something that gets regenerated on demand so dynamic fields are transient
+JUMP_GROUP_ITERATOR = None
+CURRENT_JUMP_GROUP = None
+EASY_MOTION_EDIT = None
+SELECT_TEXT = False
+COMMAND_MODE_WAS = False
 
 
 class JumpGroupIterator:
@@ -108,68 +117,92 @@ class JumpGroupIterator:
 
 
 class EasyMotionCommand(sublime_plugin.WindowCommand):
-    '''
-       We want a WindowCommand and not a TextComand so that we can control the edit/undo item so the user
-       can't "undo" back to a state where we've transformed their selection to a-zA-Z0-9
-    '''
-
-    active_view = None
-    edit = None
-    jump_target_scope = None
-    jump_group_iterator = None
-    current_jump_group = None
-    select_text = False
     winning_selection = None
-
     def run(self, character=None, select_text=False):
-        sublime.status_message("SublimeJump to " + character)
+        global JUMP_GROUP_ITERATOR, SELECT_TEXT, COMMAND_MODE_WAS
+        sublime.status_message("EasyMotion: Jump to " + character)
+
+        active_view = self.window.active_view()
+        active_view.settings().set('easy_motion_mode', True)
+        # yes, this feels a little dirty to mess with the Vintage plugin, but there
+        # doesn't appear to be any other way to tell it to not intercept keys, so turn it
+        # off (if it's on) while we're running EasyMotion
+        COMMAND_MODE_WAS = active_view.settings().get('command_mode')
+        if (COMMAND_MODE_WAS):
+            active_view.settings().set('command_mode', False)
 
         settings = sublime.load_settings("EasyMotion.sublime-settings")
-
-        self.jump_target_scope = settings.get('jump_target_scope', 'string')
         placeholder_chars = settings.get('placeholder_chars', 'abcdefghijklmnopqrstuvwxyz01234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ')
-        self.active_view = self.window.active_view()
-        self.select_text = select_text
 
-        self.jump_group_iterator = JumpGroupIterator(self.active_view, character, placeholder_chars)
+        JUMP_GROUP_ITERATOR = JumpGroupIterator(active_view, character, placeholder_chars)
 
-        if self.jump_group_iterator.has_next():
-            self.prompt_for_next_jump_group()
+        if JUMP_GROUP_ITERATOR.has_next():
+            self.window.run_command("show_jump_group")
         else:
             sublime.status_message("EasyMotion: unable to find any instances of " + character + " in visible region")
 
-    def prompt_for_next_jump_group(self):
-        if not self.jump_group_iterator.has_next():
-            self.jump_group_iterator.reset()
 
-        self.current_jump_group = self.jump_group_iterator.next()
-        self.prompt_for_jump()
+# TODO make escape/ctrl-c cancel out of EasyMotion
+# TODO set up timer to reverse things if user doesn't act?
+class ShowJumpGroup(sublime_plugin.WindowCommand):
+    jump_target_scope = None
+    active_view = None
 
-    def prompt_for_jump(self):
+    def run(self):
+        pprint("ShowJumpGroup called")
+        # TODO move this call to parse the preferences somewhere else, possibly into the view settings?
+        settings = sublime.load_settings("Preferences.sublime-settings")
+        self.jump_target_scope = settings.get('jump_target_scope', 'string')
+
+        self.active_view = self.window.active_view()
+
+        self.show_next_jump_group()
+
+    def show_next_jump_group(self):
+        global JUMP_GROUP_ITERATOR, CURRENT_JUMP_GROUP
+        if not JUMP_GROUP_ITERATOR.has_next():
+            JUMP_GROUP_ITERATOR.reset()
+
+        CURRENT_JUMP_GROUP = JUMP_GROUP_ITERATOR.next()
         self.activate_current_jump_group()
-        try:
-            self.window.show_input_panel("Pick jump target", "", self.enter_pressed, self.picked_target, self.finish_easy_motion)
-        except:
-            self.deactivate_current_jump_group()
 
-    def enter_pressed(self, selection):
-        # shouldn't get here unless the user hit enter, other selections should go through on_change branch
-        self.prompt_for_next_jump_group()
+    def activate_current_jump_group(self):
+        global CURRENT_JUMP_GROUP, EASY_MOTION_EDIT
+        '''
+            Start up an edit object if we don't have one already, then create all of the jump targets
+        '''
+        if (EASY_MOTION_EDIT is not None):
+            # normally would call deactivate_current_jump_group here, but apparent ST2 bug prevents it from calling undo correctly
+            # instead just decorate the new character and keep the same edit object so all changes get undone properly
+            self.active_view.erase_regions("jump_match_regions")
+        else:
+            EASY_MOTION_EDIT = self.active_view.begin_edit()
 
-    def picked_target(self, selection):
-        if len(selection) > 0:
-            # this will get used when hide_panel calls through to jump_to_winning_selection
-            # can't call directly because of race condition
-            self.winning_selection = self.winning_selection_from(selection)
-            self.window.run_command("hide_panel")
+        for placeholder_char in CURRENT_JUMP_GROUP.keys():
+            self.active_view.replace(EASY_MOTION_EDIT, CURRENT_JUMP_GROUP[placeholder_char], placeholder_char)
+
+        self.active_view.add_regions("jump_match_regions", CURRENT_JUMP_GROUP.values(), self.jump_target_scope, "dot")
+
+
+class JumpTo(sublime_plugin.WindowCommand):
+    def run(self, character=None):
+        global COMMAND_MODE_WAS
+
+        self.winning_selection = self.winning_selection_from(character)
+        self.active_view = self.window.active_view()
+        self.finish_easy_motion()
+        self.active_view.settings().set('easy_motion_mode', False)
+        if (COMMAND_MODE_WAS):
+            self.active_view.settings().set('command_mode', True)
 
     def winning_selection_from(self, selection):
+        global CURRENT_JUMP_GROUP, SELECT_TEXT
         winning_region = None
-        if selection in self.current_jump_group:
-            winning_region = self.current_jump_group[selection]
+        if selection in CURRENT_JUMP_GROUP:
+            winning_region = CURRENT_JUMP_GROUP[selection]
 
         if winning_region is not None:
-            if self.select_text:
+            if SELECT_TEXT:
                 for current_selection in self.active_view.sel():
                     if winning_region.begin() < current_selection.begin():
                         return sublime.Region(current_selection.end(), winning_region.begin())
@@ -177,22 +210,6 @@ class EasyMotionCommand(sublime_plugin.WindowCommand):
                         return sublime.Region(current_selection.begin(), winning_region.end())
             else:
                 return sublime.Region(winning_region.begin(), winning_region.begin())
-
-    def activate_current_jump_group(self):
-        '''
-            Start up an edit object if we don't have one already, then create all of the jump targets
-        '''
-        if (self.edit is not None):
-            # normally would call deactivate_current_jump_group here, but apparent ST2 bug prevents it from calling undo correctly
-            # instead just decorate the new character and keep the same edit object so all changes get undone properly
-            self.active_view.erase_regions("jump_match_regions")
-        else:
-            self.edit = self.active_view.begin_edit()
-
-        for placeholder_char in self.current_jump_group.keys():
-            self.active_view.replace(self.edit, self.current_jump_group[placeholder_char], placeholder_char)
-
-        self.active_view.add_regions("jump_match_regions", self.current_jump_group.values(), self.jump_target_scope, "dot")
 
     def finish_easy_motion(self):
         '''
@@ -208,10 +225,11 @@ class EasyMotionCommand(sublime_plugin.WindowCommand):
             the pristine state that we found it in.  Other methods ended up leaving the window in a dirty save state
             and this seems to be the cleanest way to get back to the original state
         '''
-        if (self.edit is not None):
-            self.active_view.end_edit(self.edit)
+        global EASY_MOTION_EDIT
+        if (EASY_MOTION_EDIT is not None):
+            self.active_view.end_edit(EASY_MOTION_EDIT)
             self.window.run_command("undo")
-            self.edit = None
+            EASY_MOTION_EDIT = None
 
         self.active_view.erase_regions("jump_match_regions")
 

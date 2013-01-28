@@ -8,5 +8,10 @@
         "keys": ["super+shift+;", "<character>"], 
         "command": "easy_motion",
         "args": {"select_text": true}
+    },
+    { 
+        "keys": ["super+;"], 
+        "command": "show_jump_group",
+        "context": [{"key": "setting.easy_motion_mode"}]
     }
 ]
