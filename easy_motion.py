@@ -225,3 +225,4 @@ class JumpToWinningSelection(sublime_plugin.TextCommand):
         sel = self.view.sel()
         sel.clear()
         sel.add(winning_region)
+        self.view.show(winning_region)
