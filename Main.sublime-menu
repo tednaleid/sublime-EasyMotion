@@ -14,7 +14,7 @@
                             // README
                             {
                                 "caption": "View README",
-                                "command": "open_file", "args": {"file": "${packages}/EasyMotion/README.markdown"}
+                                "command": "open_file", "args": {"file": "${packages}/EasyMotion/README.md"}
                             },
                             { "caption": "-" },
 
