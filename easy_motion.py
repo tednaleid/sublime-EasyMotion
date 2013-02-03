@@ -119,6 +119,7 @@ class EasyMotionCommand(sublime_plugin.WindowCommand):
     jump_group_iterator = None
     current_jump_group = None
     select_text = False
+    winning_selection = None
 
     def run(self, character=None, select_text=False):
         sublime.status_message("SublimeJump to " + character)
