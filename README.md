@@ -20,7 +20,9 @@ Then type `EasyMotion` and choose the EasyMotion plugin from the dropdown.  Hit 
 Manual installation should be as easy as cloning this git repository into your Sublime `Packages` directory.  On OSX:
 
     cd ~/Application\ Support/Sublime\ Text\ 2/Packages
-    git clone git://github.com/tednaleid/sublime-EasyMotion.git
+    git clone git://github.com/tednaleid/sublime-EasyMotion.git EasyMotion
+    
+(The directory name underneath packages __has__ to be `EasyMotion` and not `sublime-EasyMotion` for some preferences to get picked up)
 
 ## Usage
 
