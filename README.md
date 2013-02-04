@@ -81,7 +81,7 @@ So in the same situation as above, if we had hit `cmd-shift-;` followed by `r` a
 
 ### Remapping the Sublime EasyMotion keyboard shortcut
 
-You can remap your keys to be something other than the defaults by entering an override value into your "User - KeyBindings" (under Sublime Text 2 -> Preferences on OSX), just make sure to copy the existing key bindings exactly and change only the first item in the `keys` stanza, otherwise it won't work.  So if you wanted the jump command to be `ctrl-,`, you'd use:
+You can remap your keys to be something other than the defaults by entering an override value into your "User - KeyBindings" (under Sublime Text 2 -> Preferences -> Package Settings -> Easy Motion on OSX), just make sure to copy the existing key bindings exactly and change only the first item in the `keys` stanza, otherwise it won't work.  So if you wanted the jump command to be `ctrl-,`, you'd use:
 
 
     [
