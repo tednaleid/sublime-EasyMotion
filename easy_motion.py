@@ -1,7 +1,6 @@
 import sublime
 import sublime_plugin
 import re
-import string
 from itertools import izip_longest
 from pprint import pprint
 
@@ -10,27 +9,27 @@ REGEX_ESCAPE_CHARS = '\\+*()[]{}^$?|:].,'
 # not a fan of using globals like this, but not sure if there's a better way with the plugin
 # API that ST2 provides.  Tried attaching as fields to active_view, but didn't persiste, I'm guessing
 # it's just a representation of something that gets regenerated on demand so dynamic fields are transient
-JUMP_GROUP_ITERATOR = None
+JUMP_GROUP_GENERATOR = None
 CURRENT_JUMP_GROUP = None
 EASY_MOTION_EDIT = None
 SELECT_TEXT = False
 COMMAND_MODE_WAS = False
+JUMP_TARGET_SCOPE = 'string'
 
 
-class JumpGroupIterator:
+class JumpGroupGenerator:
     '''
        given a list of region jump targets matching the given character, can emit a series of
-       JumpGroup dictionaries
+       JumpGroup dictionaries going forwards with next and backwards with previous
     '''
     def __init__(self, view, character, placeholder_chars):
         self.view = view
+        self.placeholder_chars = placeholder_chars
         self.all_jump_targets = self.find_all_jump_targets_in_visible_region(character)
         self.interleaved_jump_targets = self.interleave_jump_targets_from_cursor()
         self.jump_target_index = 0
-        self.placeholder_chars = placeholder_chars
-
-    def __iter__(self):
-        return self
+        self.jump_target_groups = self.create_jump_target_groups()
+        self.jump_target_group_index = -1
 
     def interleave_jump_targets_from_cursor(self):
         sel = self.view.sel()[0]  # multi select not supported, doesn't really make sense
@@ -50,26 +49,44 @@ class JumpGroupIterator:
         # now interleave the two lists together into one list
         return [target for targets in izip_longest(before, after) for target in targets if target is not None]
 
-    def has_next(self):
+    def create_jump_target_groups(self):
+        jump_target_groups = []
+
+        while self.has_next_jump_target():
+            jump_group = dict()
+
+            for placeholder_char in self.placeholder_chars:
+                if self.has_next_jump_target():
+                    jump_group[placeholder_char] = self.interleaved_jump_targets[self.jump_target_index]
+                    self.jump_target_index += 1
+                else:
+                    break
+
+            jump_target_groups.append(jump_group)
+
+        return jump_target_groups
+
+    def has_next_jump_target(self):
         return self.jump_target_index < len(self.interleaved_jump_targets)
 
+    def __len__(self):
+        return len(self.jump_target_groups)
+
     def next(self):
-        if not self.has_next():
-            raise StopIteration
+        self.jump_target_group_index += 1
 
-        jump_group = dict()
+        if self.jump_target_group_index >= len(self.jump_target_groups) or self.jump_target_group_index < 0:
+            self.jump_target_group_index = 0
 
-        for placeholder_char in self.placeholder_chars:
-            if self.has_next():
-                jump_group[placeholder_char] = self.interleaved_jump_targets[self.jump_target_index]
-                self.jump_target_index += 1
-            else:
-                break
+        return self.jump_target_groups[self.jump_target_group_index]
 
-        return jump_group
+    def previous(self):
+        self.jump_target_group_index -= 1
 
-    def reset(self):
-        self.jump_target_index = 0
+        if self.jump_target_group_index < 0 or self.jump_target_group_index >= len(self.jump_target_groups):
+            self.jump_target_group_index = len(self.jump_target_groups) - 1
+
+        return self.jump_target_groups[self.jump_target_group_index]
 
     def find_all_jump_targets_in_visible_region(self, character):
         visible_region_begin = self.visible_region_begin()
@@ -118,8 +135,9 @@ class JumpGroupIterator:
 
 class EasyMotionCommand(sublime_plugin.WindowCommand):
     winning_selection = None
+
     def run(self, character=None, select_text=False):
-        global JUMP_GROUP_ITERATOR, SELECT_TEXT, COMMAND_MODE_WAS
+        global JUMP_GROUP_GENERATOR, SELECT_TEXT, COMMAND_MODE_WAS, JUMP_TARGET_SCOPE
         sublime.status_message("EasyMotion: Jump to " + character)
 
         active_view = self.window.active_view()
@@ -133,41 +151,40 @@ class EasyMotionCommand(sublime_plugin.WindowCommand):
 
         settings = sublime.load_settings("EasyMotion.sublime-settings")
         placeholder_chars = settings.get('placeholder_chars', 'abcdefghijklmnopqrstuvwxyz01234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ')
+        JUMP_TARGET_SCOPE = settings.get('jump_target_scope', 'string')
 
-        JUMP_GROUP_ITERATOR = JumpGroupIterator(active_view, character, placeholder_chars)
+        JUMP_GROUP_GENERATOR = JumpGroupGenerator(active_view, character, placeholder_chars)
 
-        if JUMP_GROUP_ITERATOR.has_next():
+        if len(JUMP_GROUP_GENERATOR) > 0:
             self.window.run_command("show_jump_group")
         else:
             sublime.status_message("EasyMotion: unable to find any instances of " + character + " in visible region")
 
 
 # TODO make escape/ctrl-c cancel out of EasyMotion
+# TODO make enter go to next group
+# TODO make shift-enter go to previous group
 # TODO set up timer to reverse things if user doesn't act?
 class ShowJumpGroup(sublime_plugin.WindowCommand):
-    jump_target_scope = None
     active_view = None
 
-    def run(self):
-        pprint("ShowJumpGroup called")
-        # TODO move this call to parse the preferences somewhere else, possibly into the view settings?
-        settings = sublime.load_settings("Preferences.sublime-settings")
-        self.jump_target_scope = settings.get('jump_target_scope', 'string')
-
+    def run(self, next=True):
         self.active_view = self.window.active_view()
 
-        self.show_next_jump_group()
+        self.show_jump_group(next)
 
-    def show_next_jump_group(self):
-        global JUMP_GROUP_ITERATOR, CURRENT_JUMP_GROUP
-        if not JUMP_GROUP_ITERATOR.has_next():
-            JUMP_GROUP_ITERATOR.reset()
+    def show_jump_group(self, next=True):
+        global JUMP_GROUP_GENERATOR, CURRENT_JUMP_GROUP
 
-        CURRENT_JUMP_GROUP = JUMP_GROUP_ITERATOR.next()
+        if next:
+            CURRENT_JUMP_GROUP = JUMP_GROUP_GENERATOR.next()
+        else:
+            CURRENT_JUMP_GROUP = JUMP_GROUP_GENERATOR.previous()
+
         self.activate_current_jump_group()
 
     def activate_current_jump_group(self):
-        global CURRENT_JUMP_GROUP, EASY_MOTION_EDIT
+        global CURRENT_JUMP_GROUP, EASY_MOTION_EDIT, JUMP_TARGET_SCOPE
         '''
             Start up an edit object if we don't have one already, then create all of the jump targets
         '''
@@ -181,7 +198,7 @@ class ShowJumpGroup(sublime_plugin.WindowCommand):
         for placeholder_char in CURRENT_JUMP_GROUP.keys():
             self.active_view.replace(EASY_MOTION_EDIT, CURRENT_JUMP_GROUP[placeholder_char], placeholder_char)
 
-        self.active_view.add_regions("jump_match_regions", CURRENT_JUMP_GROUP.values(), self.jump_target_scope, "dot")
+        self.active_view.add_regions("jump_match_regions", CURRENT_JUMP_GROUP.values(), JUMP_TARGET_SCOPE, "dot")
 
 
 class JumpTo(sublime_plugin.WindowCommand):

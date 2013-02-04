@@ -2,5 +2,14 @@
     { 
         "keys": ["<character>"], 
         "command": "jump_to", "context": [{"key": "setting.easy_motion_mode"}]
+    },
+    { 
+        "keys": ["enter"], 
+        "command": "show_jump_group", "context": [{"key": "setting.easy_motion_mode"}]
+    },
+    { 
+        "keys": ["shift+enter"], 
+        "command": "show_jump_group", "context": [{"key": "setting.easy_motion_mode"}], "args": {"next": false} 
     }
+ 
 ]
