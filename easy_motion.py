@@ -162,9 +162,6 @@ class EasyMotionCommand(sublime_plugin.WindowCommand):
 
 
 # TODO make escape/ctrl-c cancel out of EasyMotion
-# TODO make enter go to next group
-# TODO make shift-enter go to previous group
-# TODO set up timer to reverse things if user doesn't act?
 class ShowJumpGroup(sublime_plugin.WindowCommand):
     active_view = None
 
@@ -204,6 +201,8 @@ class ShowJumpGroup(sublime_plugin.WindowCommand):
 class JumpTo(sublime_plugin.WindowCommand):
     def run(self, character=None):
         global COMMAND_MODE_WAS
+
+        pprint("JumpTo " + str(character))
 
         self.winning_selection = self.winning_selection_from(character)
         self.active_view = self.window.active_view()
@@ -253,6 +252,20 @@ class JumpTo(sublime_plugin.WindowCommand):
     def jump_to_winning_selection(self):
         if self.winning_selection is not None:
             self.active_view.run_command("jump_to_winning_selection", {"begin": self.winning_selection.begin(), "end": self.winning_selection.end()})
+
+
+class DeactivateJumpTargets(sublime_plugin.WindowCommand):
+    def run(self):
+        pprint("DeactivateJumpTargets called")
+        global EASY_MOTION_EDIT
+
+        active_view = self.window.active_view()
+        if (EASY_MOTION_EDIT is not None):
+            active_view.end_edit(EASY_MOTION_EDIT)
+            self.window.run_command("undo")
+            EASY_MOTION_EDIT = None
+
+        active_view.erase_regions("jump_match_regions")
 
 
 class JumpToWinningSelection(sublime_plugin.TextCommand):
