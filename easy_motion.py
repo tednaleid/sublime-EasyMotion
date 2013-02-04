@@ -137,17 +137,12 @@ class EasyMotionCommand(sublime_plugin.WindowCommand):
     winning_selection = None
 
     def run(self, character=None, select_text=False):
-        global JUMP_GROUP_GENERATOR, SELECT_TEXT, COMMAND_MODE_WAS, JUMP_TARGET_SCOPE
+        global JUMP_GROUP_GENERATOR, SELECT_TEXT, JUMP_TARGET_SCOPE
         sublime.status_message("EasyMotion: Jump to " + character)
 
+        SELECT_TEXT = select_text
+
         active_view = self.window.active_view()
-        active_view.settings().set('easy_motion_mode', True)
-        # yes, this feels a little dirty to mess with the Vintage plugin, but there
-        # doesn't appear to be any other way to tell it to not intercept keys, so turn it
-        # off (if it's on) while we're running EasyMotion
-        COMMAND_MODE_WAS = active_view.settings().get('command_mode')
-        if (COMMAND_MODE_WAS):
-            active_view.settings().set('command_mode', False)
 
         settings = sublime.load_settings("EasyMotion.sublime-settings")
         placeholder_chars = settings.get('placeholder_chars', 'abcdefghijklmnopqrstuvwxyz01234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ')
@@ -156,12 +151,22 @@ class EasyMotionCommand(sublime_plugin.WindowCommand):
         JUMP_GROUP_GENERATOR = JumpGroupGenerator(active_view, character, placeholder_chars)
 
         if len(JUMP_GROUP_GENERATOR) > 0:
+            self.activate_mode(active_view)
             self.window.run_command("show_jump_group")
         else:
             sublime.status_message("EasyMotion: unable to find any instances of " + character + " in visible region")
 
+    def activate_mode(self, active_view):
+        global COMMAND_MODE_WAS
+        active_view.settings().set('easy_motion_mode', True)
+        # yes, this feels a little dirty to mess with the Vintage plugin, but there
+        # doesn't appear to be any other way to tell it to not intercept keys, so turn it
+        # off (if it's on) while we're running EasyMotion
+        COMMAND_MODE_WAS = active_view.settings().get('command_mode')
+        if (COMMAND_MODE_WAS):
+            active_view.settings().set('command_mode', False)
 
-# TODO make escape/ctrl-c cancel out of EasyMotion
+
 class ShowJumpGroup(sublime_plugin.WindowCommand):
     active_view = None
 
@@ -201,8 +206,6 @@ class ShowJumpGroup(sublime_plugin.WindowCommand):
 class JumpTo(sublime_plugin.WindowCommand):
     def run(self, character=None):
         global COMMAND_MODE_WAS
-
-        pprint("JumpTo " + str(character))
 
         self.winning_selection = self.winning_selection_from(character)
         self.active_view = self.window.active_view()
