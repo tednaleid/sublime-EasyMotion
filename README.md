@@ -100,7 +100,7 @@ You can remap your keys to be something other than the defaults by entering an o
 
 ### Overriding the placeholder characters used for jumping
 
-Add this to your "User Settings" file (found at "Sublime Text 2 -> Preferences -> Settings - User" on OSX) and change the string to contain whatever characters you'd like to use:
+Add this to your "User Settings" file (found at "Sublime Text 2 -> Preferences -> Package Settings -> Easy Motion -> Settings - User" on OSX) and change the string to contain whatever characters you'd like to use:
 
     // define the characters that we can jump to, in the order that they'll appear, they should be unique
     "placeholder_chars" : "abcdefghijklmnopqrstuvwxyz01234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -117,3 +117,7 @@ If the highlight color used for jump targets isn't bold enough if your color sch
     // other examples include: keyword, string, number
     "jump_target_scope" : "entity.name.class"
 
+
+# Versions
+
+- 0.8 - released 2/3/13 - updates location of preferences to EasyMotion specific file and includes plugin specific preferences file.  You'll need to migrate preferences over into this file for them to stick.
