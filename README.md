@@ -22,7 +22,14 @@ Manual installation should be as easy as cloning this git repository into your S
     cd ~/Application\ Support/Sublime\ Text\ 2/Packages
     git clone git://github.com/tednaleid/sublime-EasyMotion.git EasyMotion
     
-(The directory name underneath packages __has__ to be `EasyMotion` and not `sublime-EasyMotion` for some preferences to get picked up)
+(The directory name underneath packages __must__ be `EasyMotion` and not `sublime-EasyMotion` for some preferences to get picked up)
+
+If you're interested in trying the next release of the plugin, you can switch your branch to the development branch:
+
+    cd EasyMotion
+    git checkout development
+    
+This branch will have features that are marked as fixed in the issue, but haven't yet been merged to `master`.
 
 ## Usage
 
