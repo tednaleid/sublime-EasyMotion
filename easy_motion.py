@@ -124,7 +124,7 @@ class EasyMotionCommand(sublime_plugin.WindowCommand):
     def run(self, character=None, select_text=False):
         sublime.status_message("SublimeJump to " + character)
 
-        settings = sublime.load_settings("Preferences.sublime-settings")
+        settings = sublime.load_settings("EasyMotion.sublime-settings")
 
         self.jump_target_scope = settings.get('jump_target_scope', 'string')
         placeholder_chars = settings.get('placeholder_chars', 'abcdefghijklmnopqrstuvwxyz01234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ')
