@@ -68,7 +68,7 @@ The first batch of 62 targets will look like this:
 
 ![Many Matches Second](https://raw.github.com/tednaleid/sublime-EasyMotion/add_images/images/many_matches_second.png)
 
-Keep hitting `enter` and it will continue to cycle through them in groups of 62.
+Keep hitting `enter` and it will continue to cycle through them in groups of 62.  You can also hit `shift-enter` to cycle backwards through the target groups.  Hitting the `spacebar` will exit, and so will `ctrl-c` and `escape` (but for some reason there's currently a bug that makes you hit those twice to exit).
 
 ### Select all text between cursor and any visible character
 
