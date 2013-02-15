@@ -1,0 +1,23 @@
+[
+    /* haven't figured out why yet, but for some reason you need to hit ctrl+c or escape twice to get it to deactivate jump targets */
+    { 
+        "keys": ["ctrl+c"], 
+        "command": "deactivate_jump_targets", "context": [{"key": "setting.easy_motion_mode"}]
+    },
+    { 
+        "keys": ["escape"], 
+        "command": "deactivate_jump_targets", "context": [{"key": "setting.easy_motion_mode"}]
+    },
+    { 
+        "keys": ["<character>"], 
+        "command": "jump_to", "context": [{"key": "setting.easy_motion_mode"}]
+    },
+    { 
+        "keys": ["enter"], 
+        "command": "show_jump_group", "context": [{"key": "setting.easy_motion_mode"}]
+    },
+    { 
+        "keys": ["shift+enter"], 
+        "command": "show_jump_group", "context": [{"key": "setting.easy_motion_mode"}], "args": {"next": false} 
+    }
+]
