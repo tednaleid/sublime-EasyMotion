@@ -128,3 +128,4 @@ If the highlight color used for jump targets isn't bold enough if your color sch
 # Versions
 
 - 0.8 - released 2/3/13 - updates location of preferences to EasyMotion specific file and includes plugin specific preferences file.  You'll need to migrate preferences over into this file for them to stick.
+- 0.9 - released 2/14/13 - removes need for input panel and implements an easy_motion_mode to accept keystrokes, also lets `shift-enter` cycle backwards
