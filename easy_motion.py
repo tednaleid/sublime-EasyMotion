@@ -161,6 +161,8 @@ class EasyMotionCommand(sublime_plugin.WindowCommand):
         JUMP_TARGET_SCOPE = settings.get('jump_target_scope', 'string')
         case_sensitive = settings.get('case_sensitive', True)
 
+        scratch_view = self.create_scratch_view(active_view)
+
         JUMP_GROUP_GENERATOR = JumpGroupGenerator(active_view, character, placeholder_chars, case_sensitive)
 
         if len(JUMP_GROUP_GENERATOR) > 0:
@@ -168,6 +170,18 @@ class EasyMotionCommand(sublime_plugin.WindowCommand):
             self.window.run_command("show_jump_group")
         else:
             sublime.status_message("EasyMotion: unable to find any instances of " + character + " in visible region")
+
+    def create_scratch_view(self, active_view):
+        visible_region = active_view.visible_region()
+        visible_text = active_view.substr(visible_region)
+
+        scratch_view = active_view.window().new_file()
+        scratch_edit = scratch_view.begin_edit()
+        scratch_view.set_scratch(True)
+        scratch_view.insert(scratch_edit, 0, visible_text)
+        scratch_view.set_read_only(True)
+        scratch_view.end_edit(scratch_edit)
+        return scratch_view
 
     def activate_mode(self, active_view):
         global COMMAND_MODE_WAS
@@ -272,7 +286,6 @@ class JumpTo(sublime_plugin.WindowCommand):
 
 class DeactivateJumpTargets(sublime_plugin.WindowCommand):
     def run(self):
-        pprint("DeactivateJumpTargets called")
         global EASY_MOTION_EDIT
 
         active_view = self.window.active_view()
