@@ -171,9 +171,16 @@ class EasyMotionCommand(sublime_plugin.WindowCommand):
         else:
             sublime.status_message("EasyMotion: unable to find any instances of " + character + " in visible region")
 
+# TODO
+# set cursor position in new file
+# get jump targets labeled appropriately
+# X if we're far down the file generate buffer lines above so lines match
+# jump within scratch view
+# close scratch view on Jump
+
     def create_scratch_view(self, active_view):
-        visible_region = active_view.visible_region()
-        visible_text = active_view.substr(visible_region)
+        cursor_rowcol = self.existing_cursor_rowcol(active_view)
+        visible_text = self.emulate_visible_text(active_view)
 
         scratch_view = active_view.window().new_file()
         scratch_edit = scratch_view.begin_edit()
@@ -181,7 +188,28 @@ class EasyMotionCommand(sublime_plugin.WindowCommand):
         scratch_view.insert(scratch_edit, 0, visible_text)
         scratch_view.set_read_only(True)
         scratch_view.end_edit(scratch_edit)
+        self.set_similar_cursor_location(cursor_rowcol, scratch_view)
+        scratch_view.run_command('scroll_to_selection')
         return scratch_view
+
+    def emulate_visible_text(self, active_view):
+        visible_region = active_view.visible_region()
+        visible_text = active_view.substr(visible_region)
+        line_start, _ = active_view.rowcol(visible_region.begin())
+        #newline_padding = '\n' * line_start
+        #return newline_padding + visible_text
+        return visible_text
+
+    def existing_cursor_rowcol(self, active_view):
+        cursor_location = active_view.sel()[0]
+        return active_view.rowcol(cursor_location.begin())
+
+    def set_similar_cursor_location(self, existing_rowcol, scratch_view):
+        sel = scratch_view.sel()
+        sel.clear()
+        similar_location = scratch_view.text_point(existing_rowcol[0], existing_rowcol[1])
+        sel.add(similar_location)
+        scratch_view.show(similar_location)
 
     def activate_mode(self, active_view):
         global COMMAND_MODE_WAS
