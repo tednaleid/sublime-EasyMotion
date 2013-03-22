@@ -6,6 +6,9 @@ It's heavily inspired by [Vim's EasyMotion](http://www.vim.org/scripts/script.ph
 
 After pressing the EasyMotion shortcut (default `cmd-;`/`ctrl-;`), you then press the character that you'd like to jump to.  EasyMotion will then replace all currently visible instances of that character with one of `a-zA-Z0-9`.  Press the key for the one you want and your cursor will be moved right to it. 
 
+![Animated Gif](https://raw.github.com/tednaleid/sublime-EasyMotion/add_images/images/easymotion.gif)
+
+
 ## Installation
 
 ### Install via PackageControl
