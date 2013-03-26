@@ -220,8 +220,8 @@ class JumpTo(sublime_plugin.WindowCommand):
     def run(self, character=None):
         global COMMAND_MODE_WAS
 
-        self.winning_selection = self.winning_selection_from(character)
         self.active_view = self.window.active_view()
+        self.winning_selection = self.winning_selection_from(character)
         self.finish_easy_motion()
         self.active_view.settings().set('easy_motion_mode', False)
         if (COMMAND_MODE_WAS):
