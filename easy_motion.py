@@ -1,7 +1,7 @@
 import sublime
 import sublime_plugin
 import re
-from itertools import izip_longest
+from itertools import zip_longest
 from pprint import pprint
 
 REGEX_ESCAPE_CHARS = '\\+*()[]{}^$?|:].,'
@@ -46,7 +46,7 @@ class JumpGroupGenerator:
                 after.append(target)
 
         # now interleave the two lists together into one list
-        return [target for targets in izip_longest(before, after) for target in targets if target is not None]
+        return [target for targets in zip_longest(before, after) for target in targets if target is not None]
 
     def create_jump_target_groups(self):
         jump_target_groups = []
@@ -198,7 +198,7 @@ class ShowJumpGroup(sublime_plugin.TextCommand):
             # self.window.run_command("undo")
             self.view.window().run_command("undo_last_jump_targets")
 
-        self.view.add_regions("jump_match_regions", CURRENT_JUMP_GROUP.values(), JUMP_TARGET_SCOPE, "dot")
+        self.view.add_regions("jump_match_regions", list(CURRENT_JUMP_GROUP.values()), JUMP_TARGET_SCOPE, "dot")
 
 
 class UndoLastJumpTargets(sublime_plugin.WindowCommand):
@@ -264,7 +264,7 @@ class DeactivateJumpTargets(sublime_plugin.WindowCommand):
 
 class JumpToWinningSelection(sublime_plugin.TextCommand):
     def run(self, edit, begin, end):
-        winning_region = sublime.Region(long(begin), long(end))
+        winning_region = sublime.Region(int(begin), int(end))
         sel = self.view.sel()
         sel.clear()
         sel.add(winning_region)
