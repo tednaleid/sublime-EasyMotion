@@ -264,7 +264,7 @@ class DeactivateJumpTargets(sublime_plugin.WindowCommand):
 
 class JumpToWinningSelection(sublime_plugin.TextCommand):
     def run(self, edit, begin, end):
-        winning_region = sublime.Region(long(begin), long(end))
+        winning_region = sublime.Region(int(begin), int(end))
         sel = self.view.sel()
         sel.clear()
         sel.add(winning_region)
