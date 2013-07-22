@@ -5,8 +5,18 @@
         "args": {"select_text": false}
 	},
     { 
+        "keys": ["super+;", "enter"], 
+        "command": "easy_motion",
+        "args": {"select_text": false, "character": "enter"}
+    },
+    { 
         "keys": ["super+shift+;", "<character>"], 
         "command": "easy_motion",
         "args": {"select_text": true}
+    },
+    { 
+        "keys": ["super+shift+;", "enter"], 
+        "command": "easy_motion",
+        "args": {"select_text": true, "character": "enter"}
     }
 ]

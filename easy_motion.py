@@ -21,14 +21,23 @@ class JumpGroupGenerator:
        given a list of region jump targets matching the given character, can emit a series of
        JumpGroup dictionaries going forwards with next and backwards with previous
     '''
-    def __init__(self, view, character, placeholder_chars):
+    def __init__(self, view, character, placeholder_chars, case_sensitive):
         self.view = view
+        self.case_sensitive = case_sensitive
         self.placeholder_chars = placeholder_chars
         self.all_jump_targets = self.find_all_jump_targets_in_visible_region(character)
         self.interleaved_jump_targets = self.interleave_jump_targets_from_cursor()
         self.jump_target_index = 0
         self.jump_target_groups = self.create_jump_target_groups()
         self.jump_target_group_index = -1
+
+    def determine_re_flags(self, character):
+        if character == 'enter':
+            return '(?m)'
+        elif self.case_sensitive:
+            return '(?i)'
+        else:
+            return ''
 
     def interleave_jump_targets_from_cursor(self):
         sel = self.view.sel()[0]  # multi select not supported, doesn't really make sense
@@ -92,9 +101,9 @@ class JumpGroupGenerator:
         visible_text = self.visible_text()
         folded_regions = self.get_folded_regions(self.view)
         matching_regions = []
-        escaped_character = self.escape_character(character)
+        target_regexp = self.target_regexp(character)
 
-        for char_at in (match.start() for match in re.finditer(escaped_character, visible_text)):
+        for char_at in (match.start() for match in re.finditer(target_regexp, visible_text)):
             char_point = char_at + visible_region_begin
             char_region = sublime.Region(char_point, char_point + 1)
             if not self.region_list_contains_region(folded_regions, char_region):
@@ -115,11 +124,14 @@ class JumpGroupGenerator:
         visible_region = self.view.visible_region()
         return self.view.substr(visible_region)
 
-    def escape_character(self, character):
+    def target_regexp(self, character):
+        re_flags = self.determine_re_flags(character)
         if (REGEX_ESCAPE_CHARS.find(character) >= 0):
-            return '\\' + character
+            return re_flags + '\\' + character
+        elif character == "enter":
+            return re_flags + "(?=^).|.(?=$)"
         else:
-            return character
+            return re_flags + character
 
     def get_folded_regions(self, view):
         '''
@@ -145,8 +157,9 @@ class EasyMotionCommand(sublime_plugin.WindowCommand):
         settings = sublime.load_settings("EasyMotion.sublime-settings")
         placeholder_chars = settings.get('placeholder_chars', 'abcdefghijklmnopqrstuvwxyz01234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ')
         JUMP_TARGET_SCOPE = settings.get('jump_target_scope', 'string')
+        case_sensitive = settings.get('case_sensitive', True)
 
-        JUMP_GROUP_GENERATOR = JumpGroupGenerator(self.active_view, character, placeholder_chars)
+        JUMP_GROUP_GENERATOR = JumpGroupGenerator(self.active_view, character, placeholder_chars, case_sensitive)
 
         if len(JUMP_GROUP_GENERATOR) > 0:
             self.start_easy_motion()
@@ -215,8 +228,8 @@ class JumpTo(sublime_plugin.WindowCommand):
     def run(self, character=None):
         global COMMAND_MODE_WAS
 
-        self.winning_selection = self.winning_selection_from(character)
         self.active_view = self.window.active_view()
+        self.winning_selection = self.winning_selection_from(character)
         self.finish_easy_motion()
         self.active_view.settings().set('easy_motion_mode', False)
         if (COMMAND_MODE_WAS):

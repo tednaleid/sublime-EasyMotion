@@ -6,6 +6,9 @@ It's heavily inspired by [Vim's EasyMotion](http://www.vim.org/scripts/script.ph
 
 After pressing the EasyMotion shortcut (default `cmd-;`/`ctrl-;`), you then press the character that you'd like to jump to.  EasyMotion will then replace all currently visible instances of that character with one of `a-zA-Z0-9`.  Press the key for the one you want and your cursor will be moved right to it. 
 
+![Animated Gif](https://raw.github.com/tednaleid/sublime-EasyMotion/add_images/images/easymotion.gif)
+
+
 ## Installation
 
 ### Install via PackageControl
@@ -22,7 +25,14 @@ Manual installation should be as easy as cloning this git repository into your S
     cd ~/Application\ Support/Sublime\ Text\ 2/Packages
     git clone git://github.com/tednaleid/sublime-EasyMotion.git EasyMotion
     
-(The directory name underneath packages __has__ to be `EasyMotion` and not `sublime-EasyMotion` for some preferences to get picked up)
+(The directory name underneath packages __must__ be `EasyMotion` and not `sublime-EasyMotion` for some preferences to get picked up)
+
+If you're interested in trying the next release of the plugin, you can switch your branch to the development branch:
+
+    cd EasyMotion
+    git checkout development
+    
+This branch will have features that are marked as fixed in the issue, but haven't yet been merged to `master`.
 
 ## Usage
 
@@ -61,7 +71,7 @@ The first batch of 62 targets will look like this:
 
 ![Many Matches Second](https://raw.github.com/tednaleid/sublime-EasyMotion/add_images/images/many_matches_second.png)
 
-Keep hitting `enter` and it will continue to cycle through them in groups of 62.
+Keep hitting `enter` and it will continue to cycle through them in groups of 62.  You can also hit `shift-enter` to cycle backwards through the target groups.  Hitting the `spacebar` will exit, and so will `ctrl-c` and `escape` (but for some reason there's currently a bug that makes you hit those twice to exit).
 
 ### Select all text between cursor and any visible character
 
@@ -121,3 +131,4 @@ If the highlight color used for jump targets isn't bold enough if your color sch
 # Versions
 
 - 0.8 - released 2/3/13 - updates location of preferences to EasyMotion specific file and includes plugin specific preferences file.  You'll need to migrate preferences over into this file for them to stick.
+- 0.9 - released 2/14/13 - removes need for input panel and implements an easy_motion_mode to accept keystrokes, also lets `shift-enter` cycle backwards
