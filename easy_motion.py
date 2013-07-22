@@ -198,7 +198,7 @@ class ShowJumpGroup(sublime_plugin.TextCommand):
             # self.window.run_command("undo")
             self.view.window().run_command("undo_last_jump_targets")
 
-        self.view.add_regions("jump_match_regions", CURRENT_JUMP_GROUP.values(), JUMP_TARGET_SCOPE, "dot")
+        self.view.add_regions("jump_match_regions", list(CURRENT_JUMP_GROUP.values()), JUMP_TARGET_SCOPE, "dot")
 
 
 class UndoLastJumpTargets(sublime_plugin.WindowCommand):
