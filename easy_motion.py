@@ -1,7 +1,7 @@
 import sublime
 import sublime_plugin
 import re
-from itertools import izip_longest
+from itertools import zip_longest
 from pprint import pprint
 
 REGEX_ESCAPE_CHARS = '\\+*()[]{}^$?|:].,'
@@ -46,7 +46,7 @@ class JumpGroupGenerator:
                 after.append(target)
 
         # now interleave the two lists together into one list
-        return [target for targets in izip_longest(before, after) for target in targets if target is not None]
+        return [target for targets in zip_longest(before, after) for target in targets if target is not None]
 
     def create_jump_target_groups(self):
         jump_target_groups = []
