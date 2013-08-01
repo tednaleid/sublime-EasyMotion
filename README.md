@@ -22,7 +22,7 @@ Then type `EasyMotion` and choose the EasyMotion plugin from the dropdown.  Hit 
 
 Manual installation should be as easy as cloning this git repository into your Sublime `Packages` directory.  On OSX:
 
-    cd ~/Application\ Support/Sublime\ Text\ 2/Packages
+    cd ~/Library/Application\ Support/Sublime\ Text\ 2/Packages
     git clone git://github.com/tednaleid/sublime-EasyMotion.git EasyMotion
     
 (The directory name underneath packages __must__ be `EasyMotion` and not `sublime-EasyMotion` for some preferences to get picked up)
@@ -38,7 +38,7 @@ This branch will have features that are marked as fixed in the issue, but haven'
 
 There is experimental support for Sublime Text 3 on the `st3` branch that requires manual installation and the use of the `st3` branch.
 
-    cd ~/Application\ Support/Sublime\ Text\ 3/Packages
+    cd ~/Library/Application\ Support/Sublime\ Text\ 3/Packages
     git clone git://github.com/tednaleid/sublime-EasyMotion.git EasyMotion
     cd EasyMotion
     git checkout st3
