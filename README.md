@@ -6,6 +6,8 @@ It's heavily inspired by [Vim's EasyMotion](http://www.vim.org/scripts/script.ph
 
 After pressing the EasyMotion shortcut (default `cmd-;`/`ctrl-;`), you then press the character that you'd like to jump to.  EasyMotion will then replace all currently visible instances of that character with one of `a-zA-Z0-9`.  Press the key for the one you want and your cursor will be moved right to it. 
 
+Here I'm pressing `cmd-;` followed by `f`.  EasyMotion highlights the 6 visible "f" characters with `a-f`.  I then press `d` to jump to the beginning of the `function`.
+
 ![Animated Gif](https://raw.github.com/tednaleid/sublime-EasyMotion/add_images/images/easymotion.gif)
 
 
