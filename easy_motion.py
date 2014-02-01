@@ -228,8 +228,11 @@ class JumpTo(sublime_plugin.WindowCommand):
             self.active_view.settings().set('command_mode', True)
 
     def winning_selection_from(self, selection):
-        global CURRENT_JUMP_GROUP, SELECT_TEXT
+        global CURRENT_JUMP_GROUP, SELECT_TEXT, COMMAND_MODE_WAS
         winning_region = None
+
+        in_insert_mode = not COMMAND_MODE_WAS
+
         if selection in CURRENT_JUMP_GROUP:
             winning_region = CURRENT_JUMP_GROUP[selection]
 
@@ -240,6 +243,8 @@ class JumpTo(sublime_plugin.WindowCommand):
                         return sublime.Region(current_selection.end(), winning_region.begin())
                     else:
                         return sublime.Region(current_selection.begin(), winning_region.end())
+            elif in_insert_mode: 
+                return sublime.Region(winning_region.begin()+1, winning_region.begin()+1)
             else:
                 return sublime.Region(winning_region.begin(), winning_region.begin())
 
