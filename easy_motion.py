@@ -274,6 +274,10 @@ class DeactivateJumpTargets(sublime_plugin.WindowCommand):
         active_view.erase_regions("jump_match_regions")
         self.window.run_command("undo")
 
+        active_view.settings().set('easy_motion_mode', False)
+        if (COMMAND_MODE_WAS):
+            active_view.settings().set('command_mode', True)
+
 
 class JumpToWinningSelection(sublime_plugin.TextCommand):
     def run(self, edit, begin, end):
