@@ -181,13 +181,9 @@ class EasyMotionCommand(sublime_plugin.WindowCommand):
             self.active_view.settings().set('command_mode', False)
 
 
-class ShowJumpGroup(sublime_plugin.TextCommand):
-    active_view = None
-    edit = None
-
-    def run(self, edit, next=True):
-        self.edit = edit
-
+class ShowJumpGroupCommand(sublime_plugin.WindowCommand):
+    def run(self, next=True):
+        self.active_view = self.window.active_view()
         self.show_jump_group(next)
 
     def show_jump_group(self, next=True):
@@ -201,17 +197,26 @@ class ShowJumpGroup(sublime_plugin.TextCommand):
         self.activate_current_jump_group()
 
     def activate_current_jump_group(self):
+        if self.active_view.get_regions("jump_match_regions") != []:
+            self.active_view.erase_regions("jump_match_regions")
+            self.window.run_command("undo")
+            # self.view.window().run_command("undo_last_jump_targets")
+
+        self.active_view.run_command('set_text_em')
+
+        self.active_view.add_regions("jump_match_regions", list(CURRENT_JUMP_GROUP.values()), JUMP_TARGET_SCOPE, "dot")
+
+
+class SetTextEmCommand(sublime_plugin.TextCommand):
+    active_view = None
+    edit = None
+
+    def run(self, edit):
+        self.edit = edit
         global CURRENT_JUMP_GROUP, JUMP_TARGET_SCOPE
 
         for placeholder_char in CURRENT_JUMP_GROUP.keys():
             self.view.replace(self.edit, CURRENT_JUMP_GROUP[placeholder_char], placeholder_char)
-
-        if self.view.get_regions("jump_match_regions") != []:
-            self.view.erase_regions("jump_match_regions")
-            # self.window.run_command("undo")
-            self.view.window().run_command("undo_last_jump_targets")
-
-        self.view.add_regions("jump_match_regions", list(CURRENT_JUMP_GROUP.values()), JUMP_TARGET_SCOPE, "dot")
 
 
 class UndoLastJumpTargets(sublime_plugin.WindowCommand):
