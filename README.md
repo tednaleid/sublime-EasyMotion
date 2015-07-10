@@ -38,6 +38,8 @@ This branch will have features that are marked as fixed in the issue, but haven'
 
 ### Sublime Text 3 Experimental Support
 
+This is _not supported, and there are no plans for adding any further support in the future_.  For ST3, I'd suggest looking at the [AceJump plugin](https://github.com/ice9js/ace-jump-sublime).
+
 There is experimental support for Sublime Text 3 on the `st3` branch that requires manual installation and the use of the `st3` branch.
 
     cd ~/Library/Application\ Support/Sublime\ Text\ 3/Packages
